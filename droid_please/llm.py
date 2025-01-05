@@ -1,5 +1,6 @@
 from abc import ABC
-from typing import TypeVar, Type, List, Generator, Iterable, Any
+from datetime import datetime
+from typing import TypeVar, Type, List, Generator, Iterable, Any, Optional
 
 from anthropic import Anthropic, TextEvent, InputJsonEvent
 from anthropic.types import (
@@ -72,7 +73,7 @@ class AnthropicLLM(LLM):
             max_tokens=self.max_tokens,
             **kwargs,
         ) as chunk_stream:
-            block: RawContentBlockStartEvent = None
+            block: Optional[RawContentBlockStartEvent] = None
             for chunk in chunk_stream:
                 if isinstance(chunk, RawContentBlockStartEvent):
                     block = chunk

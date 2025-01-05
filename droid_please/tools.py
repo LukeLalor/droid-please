@@ -30,7 +30,7 @@ def read_file(file_path: str) -> str:
         rtn = "\n".join(
             (
                 f"{i}{' '*(number_length-len(str(i)))}|{lines[i-1]}"
-                for i in range(1, min(len(lines)+1, limit))
+                for i in range(1, min(len(lines) + 1, limit))
             )
         )
         if len(lines) > limit:

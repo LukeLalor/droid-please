@@ -91,11 +91,19 @@ class Agent:
                                 type="tool_use",
                             )
                         )
+                        try:
+                            tool_response_str = (
+                                yaml.dump(tool_response)
+                                if not isinstance(tool_response, str)
+                                else tool_response
+                            )
+                        except Exception as e:
+                            tool_response_str = str(e)
                         tool_responses.append(
                             ToolResultBlockParam(
                                 tool_use_id=block[0].id,
                                 type="tool_result",
-                                content=str(tool_response),
+                                content=tool_response_str,
                                 is_error=is_error,
                             )
                         )
