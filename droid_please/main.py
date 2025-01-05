@@ -5,10 +5,10 @@ import typer
 from anthropic.types import MessageParam
 from rich.console import Console
 from rich.style import Style
-from calc_please.agent import Agent
-from calc_please.config import load_config, config
-from calc_please.llm import AnthropicLLM, ResponseChunk, ToolCallChunk
-from calc_please.tools import read_file
+from droid_please.agent import Agent
+from droid_please.config import load_config, config
+from droid_please.llm import AnthropicLLM, ResponseChunk, ToolCallChunk
+from droid_please.tools import read_file
 
 assert readline  # importing this allows better cli experience, assertion to prevent optimize imports from removing it
 
@@ -29,7 +29,7 @@ except FileNotFoundError as e:
 @app.callback()
 def callback():
     """
-    Calculator, your coding ai assistant
+    Droid, your coding ai assistant
     """
     pass
 
@@ -37,7 +37,7 @@ def callback():
 @app.command()
 def please():
     """
-    Ask the calculator to do something.
+    Ask the droid to do something.
     """
     agent = None
     while True:

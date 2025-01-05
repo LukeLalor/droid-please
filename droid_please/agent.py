@@ -13,8 +13,8 @@ from anthropic.types import (
     ToolUseBlockParam,
     TextBlockParam,
 )
-from calc_please.llm import LLM, ToolCallChunk, ResponseChunk, ToolResponse
-from calc_please.util import callable_params_as_json_schema
+from droid_please.llm import LLM, ToolCallChunk, ResponseChunk, ToolResponse
+from droid_please.util import callable_params_as_json_schema
 
 
 class Agent:

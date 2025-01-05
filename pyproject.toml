@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "calc-please"
+name = "droid-please"
 version = "0.0.1"
 description = "Simple cli for genai project management"
 authors = ["Luke Lalor <lukehlalor@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.scripts]
-calc = "calc_please.main:app"
+droid = "droid_please.main:app"
 
 [tool.poetry.dependencies]
 python = "^3.10"

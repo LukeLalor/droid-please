@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Tuple, List
 
 from anthropic import BaseModel
-from calc_please.config import config
+from droid_please.config import config
 
 
 def _check_file_path(file_path: str):
