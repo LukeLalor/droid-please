@@ -4,4 +4,3 @@ pre_execution_hooks:
   - "git status --porcelain || git commit -am 'pre droid stash'"
 post_execution_hook:
   - "git status --porcelain || git commit -am 'droid activity'"
-
