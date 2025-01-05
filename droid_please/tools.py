@@ -80,16 +80,17 @@ def update_file(file_path: str, updates: List[Update]):
     with open(loc, "r") as f:
         lines = f.read().splitlines()
     lines_to_delete = set()
-    insertion_points = dict()
+    insertion_lines = dict()
     for update in updates:
         for i in range(update.insert_line, update.replace_until_line):
             lines_to_delete.add(i)
-        insertion_points[update.insert_line] = update.content
+        insertion_lines[update.insert_line] = update.content
     acc = []
     for i in range(len(lines)):
-        if i in insertion_points:
-            acc.extend(insertion_points[i])
-        if i not in lines_to_delete:
+        line_number = i+1
+        if line_number in insertion_lines:
+            acc.extend(insertion_lines[line_number])
+        if line_number not in lines_to_delete:
             acc.append(lines[i])
     with open(loc, "w") as f:
         f.write("\n".join(acc))
