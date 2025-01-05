@@ -12,10 +12,12 @@ A simple CLI tool that acts as your AI coding assistant, powered by Anthropic's 
 
 ## Installation
 
-This project uses Poetry for dependency management. To install:
+This project uses Poetry for dependency management. To install from source:
 
 ```bash
-pip install droid-please
+git clone https://github.com/yourusername/droid-please.git
+cd droid-please
+poetry install
 ```
 
 ## Configuration
@@ -31,10 +33,10 @@ After installation, you can use the CLI tool with the `droid` command:
 
 ```bash
 # Start an interactive session
-droid please
+droid
 
 # Or directly pass a command
-droid please "update the version number in pyproject.toml"
+droid "update the version number in pyproject.toml"
 ```
 
 The assistant will interpret your natural language commands and perform the appropriate actions on your project files.
