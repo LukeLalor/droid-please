@@ -1,20 +1,16 @@
 import os
-import time
-
-import typer
 import readline
 
+import typer
 from anthropic.types import MessageParam
+from rich.console import Console
+from rich.style import Style
 from calc_please.agent import Agent
-from calc_please.llm import AnthropicLLM, ResponseChunk, ToolCallChunk
 from calc_please.config import load_config, config
+from calc_please.llm import AnthropicLLM, ResponseChunk, ToolCallChunk
 from calc_please.tools import read_file
 
 assert readline  # importing this allows better cli experience, assertion to prevent optimize imports from removing it
-
-from rich.console import Console
-from rich.style import Style
-
 
 app = typer.Typer()
 
@@ -22,7 +18,6 @@ console = Console()
 agent_console = Console(style="green italic")
 dim_console = Console(style=Style(dim=True))
 err_console = Console(stderr=True, style="red")
-
 
 try:
     load_config()

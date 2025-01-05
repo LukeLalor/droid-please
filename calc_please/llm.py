@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import TypeVar, Type, Any, List, Dict, Generator, Iterable, Literal
+from typing import TypeVar, Type, List, Generator, Iterable
 
 from anthropic import Anthropic, TextEvent, InputJsonEvent
 from anthropic.types import (
@@ -8,7 +8,6 @@ from anthropic.types import (
     RawContentBlockStartEvent,
     TextBlock,
     ToolUseBlock,
-    RawContentBlockStopEvent,
 )
 from pydantic import BaseModel
 

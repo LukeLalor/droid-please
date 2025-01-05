@@ -9,7 +9,7 @@ def _check_file_path(file_path: str):
     root = Path(config().project_root)
     loc = root.joinpath(file_path)
     if not loc.is_relative_to(root):
-        raise ValueError(f"Cannot interact with files outside of project root")
+        raise ValueError("Cannot interact with files outside of project root")
 
 
 def read_file(file_path: str) -> str:

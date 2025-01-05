@@ -10,11 +10,11 @@ from anthropic.types import (
     MessageParam,
     ToolParam,
     ToolResultBlockParam,
-    ToolUseBlockParam, TextBlockParam,
+    ToolUseBlockParam,
+    TextBlockParam,
 )
 from calc_please.llm import LLM, ToolCallChunk, ResponseChunk, ToolResponse
 from calc_please.util import callable_params_as_json_schema
-from pydantic import TypeAdapter
 
 
 class Agent:
@@ -41,31 +41,39 @@ class Agent:
                 tools=[tw.tool for tw in tools.values()],
             ):
                 if isinstance(chunk, ToolCallChunk):
-                    if not agent_response or not isinstance(agent_response[-1][-1], ToolCallChunk) or not agent_response[-1][-1].id == chunk.id:
+                    if (
+                        not agent_response
+                        or not isinstance(agent_response[-1][-1], ToolCallChunk)
+                        or not agent_response[-1][-1].id == chunk.id
+                    ):
                         agent_response.append([])
                     agent_response[-1].append(chunk)
                 elif isinstance(chunk, ResponseChunk):
-                    if not agent_response or not isinstance(agent_response[-1][-1], ResponseChunk):
+                    if not agent_response or not isinstance(
+                        agent_response[-1][-1], ResponseChunk
+                    ):
                         agent_response.append([])
                     agent_response[-1].append(chunk)
                 else:
                     raise NotImplementedError("unknown chunk type")
                 yield chunk
-            if len(agent_response) == 1 and isinstance(agent_response[0][0], ResponseChunk):
+            if len(agent_response) == 1 and isinstance(
+                agent_response[0][0], ResponseChunk
+            ):
                 join = "".join([r.content for r in agent_response[0]])
-                self.messages.append(MessageParam(
-                    content=join, role="assistant"
-                ))
+                self.messages.append(MessageParam(content=join, role="assistant"))
                 break
             else:
                 tool_responses: List[ToolResultBlockParam] = []
                 block_acc: List[TextBlockParam | ToolUseBlockParam] = []
                 for block in agent_response:
                     if isinstance(block[0], ResponseChunk):
-                        block_acc.append(TextBlockParam(
-                            type="text",
-                            text="".join([r.content for r in block]),
-                        ))
+                        block_acc.append(
+                            TextBlockParam(
+                                type="text",
+                                text="".join([r.content for r in block]),
+                            )
+                        )
                     elif isinstance(block[0], ToolCallChunk):
                         # todo consider what to do if this fails. needs to be valid dict to send back to llm
                         tc_args = ToolWrapper.args(block)
@@ -75,28 +83,36 @@ class Agent:
                         except Exception as e:
                             tool_response = str(e)
                             is_error = True
-                        block_acc.append(ToolUseBlockParam(
-                            id=block[0].id,
-                            input=tc_args,
-                            name=block[0].tool,
-                            type="tool_use",
-                        ))
-                        tool_responses.append(ToolResultBlockParam(
-                            tool_use_id=block[0].id,
-                            type="tool_result",
-                            content=tool_response,
-                            is_error=is_error,
-                        ))
+                        block_acc.append(
+                            ToolUseBlockParam(
+                                id=block[0].id,
+                                input=tc_args,
+                                name=block[0].tool,
+                                type="tool_use",
+                            )
+                        )
+                        tool_responses.append(
+                            ToolResultBlockParam(
+                                tool_use_id=block[0].id,
+                                type="tool_result",
+                                content=tool_response,
+                                is_error=is_error,
+                            )
+                        )
                     else:
                         raise NotImplementedError("unknown chunk type")
-                self.messages.append(MessageParam(
-                    role="assistant",
-                    content=block_acc,
-                ))
-                self.messages.append(MessageParam(
-                    role="user",
-                    content=tool_responses,
-                ))
+                self.messages.append(
+                    MessageParam(
+                        role="assistant",
+                        content=block_acc,
+                    )
+                )
+                self.messages.append(
+                    MessageParam(
+                        role="user",
+                        content=tool_responses,
+                    )
+                )
 
     def clone(self) -> Agent:
         return Agent(
