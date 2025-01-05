@@ -1,7 +1,7 @@
 model: claude-3-5-sonnet-latest
 max_tokens: 8192
 pre_execution_hooks:
-  - "git commit -am 'pre droid stash'"
+  - "git status --porcelain || git commit -am 'pre droid stash'"
 post_execution_hook:
-  - "git commit -am 'droid activity'"
+  - "git status --porcelain || git commit -am 'droid activity'"
 
