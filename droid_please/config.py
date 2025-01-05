@@ -16,7 +16,9 @@ class Config(BaseModel):
     def llm(self):
         api_key = os.getenv("ANTHROPIC_API_KEY")
         if not api_key:
-            raise RuntimeError("ANTHROPIC_API_KEY must be set in .droid/.env or as an environment variable. Run \"export ANTHROPIC_API_KEY=<your_key>\" to set it.")
+            raise RuntimeError(
+                'ANTHROPIC_API_KEY must be set in .droid/.env or as an environment variable. Run "export ANTHROPIC_API_KEY=<your_key>" to set it.'
+            )
         return AnthropicLLM(
             api_key=api_key,
             model=self.model,

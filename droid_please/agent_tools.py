@@ -6,7 +6,6 @@ from anthropic import BaseModel
 from droid_please.config import config
 
 
-
 def _check_file_path(file_path: str):
     root = Path(config().project_root)
     loc = root.joinpath(file_path)
@@ -95,7 +94,7 @@ def update_file(file_path: str, updates: List[Update]):
         insertion_lines[update.insert_line] = update.content
     acc = []
     for i in range(len(lines)):
-        line_number = i+1
+        line_number = i + 1
         if line_number in insertion_lines:
             acc.extend(insertion_lines[line_number])
         if line_number not in lines_to_delete:

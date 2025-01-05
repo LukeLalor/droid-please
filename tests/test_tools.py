@@ -9,7 +9,8 @@ from droid_please.tools import (
     update_file,
     rename_file,
     delete_path,
-    ls, Update,
+    ls,
+    Update,
 )
 
 
@@ -35,7 +36,11 @@ def test_update_file(config):
     create_file("foo.txt", ["line1", "line2", "line3"])
     update_file(
         "foo.txt",
-        [Update.model_validate({"insert_line": 2, "replace_until_line": 3, "content": ["new line2"]})],
+        [
+            Update.model_validate(
+                {"insert_line": 2, "replace_until_line": 3, "content": ["new line2"]}
+            )
+        ],
     )
     with open(Path(config.project_root).joinpath("foo.txt"), "r") as f:
         assert f.read() == "line1\nnew line2\nline3"

@@ -2,7 +2,7 @@ import os
 import readline
 import time
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated, Optional, List
 
 import typer
 from anthropic import AuthenticationError
@@ -11,7 +11,14 @@ from rich.console import Console
 from rich.style import Style
 
 from droid_please.agent import Agent
-from droid_please.agent_tools import read_file, update_file, rename_file, delete_path, ls, create_file
+from droid_please.agent_tools import (
+    read_file,
+    update_file,
+    rename_file,
+    delete_path,
+    ls,
+    create_file,
+)
 from droid_please.config import load_config, config, Config
 from droid_please.llm import ResponseChunk, ToolCallChunk, ToolResponse
 
@@ -44,7 +51,7 @@ def init(loc: Annotated[Path, typer.Argument()] = Path.cwd()):
     except FileExistsError:
         err_console.print(f"Directory {droid_dir} already exists")
         raise SystemExit(1)
-    
+
     # Create an empty config.yaml
     config_yaml = droid_dir.joinpath("config.yaml")
     Config(project_root=str(loc)).write(config_yaml)
@@ -57,7 +64,9 @@ def init(loc: Annotated[Path, typer.Argument()] = Path.cwd()):
 
     if not os.getenv("ANTHROPIC_API_KEY"):
         # prompt for the api key. not required but recommended
-        api_key = typer.prompt("Anthropic API key (optional)", default="", show_default=False)
+        api_key = typer.prompt(
+            "Anthropic API key (optional)", default="", show_default=False
+        )
         if api_key:
             with open(droid_dir.joinpath(".env"), "w") as f:
                 f.write(f"ANTHROPIC_API_KEY={api_key}")
@@ -67,7 +76,9 @@ def _load_config():
     try:
         load_config()
     except FileNotFoundError:
-        err_console.print("Could not find .droid directory. Run \"droid init\" to create one.")
+        err_console.print(
+            'Could not find .droid directory. Run "droid init" to create one.'
+        )
         raise SystemExit(1)
 
 
@@ -80,20 +91,23 @@ def _llm():
 
 
 @app.command()
-def please(command: Annotated[Optional[str], typer.Argument()] = None):
+def please(
+    prompt: Annotated[List[str], typer.Argument()] = None,
+    interactive: Annotated[bool, typer.Option("--interactive", "-i")] = False,
+):
     """
     Ask the droid to do something.
     """
     _load_config()
     agent = Agent(llm=_llm())
-    while True:
-        command = command or typer.prompt(text=">", prompt_suffix="")
-        execution_loop(agent, command)
-        command = None
+    execution_loop(agent, interactive, " ".join(prompt) if prompt else None)
 
 
 @app.command(name="continue")
-def continue_(command: Annotated[Optional[str], typer.Argument()] = None):
+def continue_(
+    prompt: Annotated[List[str], typer.Argument()] = None,
+    interactive: Annotated[bool, typer.Option("--interactive", "-i")] = False,
+):
     """
     Continue a conversation with the droid.
     """
@@ -102,13 +116,23 @@ def continue_(command: Annotated[Optional[str], typer.Argument()] = None):
         Path(config().project_root).joinpath(".droid/conversation.yaml"),
         llm=_llm(),
     )
-    while True:
-        command = command or typer.prompt(text=">", prompt_suffix="")
-        execution_loop(agent, command)
-        command = None
+    execution_loop(agent, interactive, " ".join(prompt) if prompt else None)
 
 
-def execution_loop(agent: Agent, command: str):
+def execution_loop(agent, interactive, prompt):
+    if not prompt:
+        if not interactive:
+            err_console.print("Error: prompt is required in non-interactive mode")
+            raise SystemExit(1)
+        else:
+            prompt = typer.prompt(text=">", prompt_suffix="")
+    execute(agent, prompt)
+    while interactive:
+        prompt = typer.prompt(text=">", prompt_suffix="")
+        execute(agent, prompt)
+
+
+def execute(agent: Agent, command: str):
     status = console.status("thinking...")
     status.start()
     last_chunk = None
