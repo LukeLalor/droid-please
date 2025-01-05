@@ -108,7 +108,7 @@ def please(
 def continue_(
     prompt: Annotated[List[str], typer.Argument()] = None,
     interactive: Annotated[bool, typer.Option("--interactive", "-i")] = False,
-    conversation: Annotated[Optional[str], typer.Option("--conversation", "-c")] = None,
+    conversation: Annotated[Optional[Path], typer.Option("--conversation", "-c")] = None,
 ):
     """
     Continue a conversation with the droid.
@@ -116,9 +116,8 @@ def continue_(
     """
     _load_config()
     agent = Agent.load(
-        Path(config().project_root).joinpath(".droid"),
+        loc=conversation,
         llm=_llm(),
-        conversation_id=conversation,
     )
     execution_loop(agent, interactive, " ".join(prompt) if prompt else None)
 

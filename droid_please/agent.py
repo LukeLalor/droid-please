@@ -165,20 +165,17 @@ class Agent:
             )
 
     @staticmethod
-    def load(base_dir: str | PathLike, llm: LLM, conversation_id: str = None) -> Agent:
-        conv_dir = Path(base_dir).joinpath('conversations')
-        if conversation_id:
-            filepath = conv_dir.joinpath(f'{conversation_id}.yaml')
-            if not filepath.exists():
-                raise FileNotFoundError(f'Conversation {conversation_id} not found')
-        else:
+    def load(loc: str | PathLike, llm: LLM) -> Agent:
+        if not loc:
             # Get the latest conversation file
-            conv_files = glob.glob(str(conv_dir.joinpath('*.yaml')))
+            conversation_dir = Path(config().project_root).joinpath('.droid/conversations')
+            pattern = str(conversation_dir.joinpath('*.yaml'))
+            conv_files = glob.glob(pattern)
             if not conv_files:
                 raise FileNotFoundError('No conversations found')
-            filepath = max(conv_files)
+            loc = max(conv_files)  # since conversations are prefixed with numbers, this will get the latest
 
-        with open(filepath, 'r') as f:
+        with open(loc, 'r') as f:
             data = yaml.load(f, Loader=yaml.SafeLoader)
         agent = Agent(llm=llm, boot_messages=data['boot_messages'])
         agent.messages = data['messages']
