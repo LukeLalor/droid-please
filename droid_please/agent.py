@@ -164,7 +164,7 @@ class ToolWrapper:
 
     @staticmethod
     def args(chunks: List[ToolCallChunk]):
-        return json.loads("".join([c.content for c in chunks]))
+        return json.loads("".join([c.content for c in chunks]) or "{}")
 
     def execute(self, args: dict):
         jsonschema.validate(instance=args, schema=self._param_schema)

@@ -63,14 +63,14 @@ def please(command: Annotated[str, typer.Argument()] = None):
                 if status:
                     status.stop()
                     status = None
-                if last_chunk and isinstance(last_chunk, ToolCallChunk):
-                    agent_console.print("\n", chunk.content.lstrip(), sep="", end="")
-                else:
+                if not last_chunk or isinstance(last_chunk, ResponseChunk):
                     agent_console.print(chunk.content, end="")
+                else:
+                    agent_console.print("\n", chunk.content.lstrip(), sep="", end="")
             elif isinstance(chunk, ToolCallChunk):
                 t1 = time.perf_counter()
                 if not last_chunk or not isinstance(last_chunk, ToolCallChunk) or chunk.id != last_chunk.id:
-                    dim_console.print("\n", "calling tool", chunk.tool, sep="", end="")
+                    dim_console.print("\n", "calling tool ", chunk.tool, sep="", end="")
                 elif chunk.content and (t1-t0)*1000 > 200:
                     dim_console.print(".", end="")
                 t0 = t1
