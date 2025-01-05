@@ -20,6 +20,10 @@ class Config(BaseModel):
             max_tokens=self.max_tokens,
         )
 
+    def write(self, path: Path):
+        with open(path, "w") as f:
+            yaml.dump(self.model_dump(exclude={"project_root"}), f)
+
 
 _config: Config = None
 

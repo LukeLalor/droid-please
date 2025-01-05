@@ -1,14 +1,16 @@
+import os
 import readline
 import time
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Optional
 
 import typer
+import yaml
 from anthropic.types import MessageParam
 from rich.console import Console
 from rich.style import Style
 from droid_please.agent import Agent
-from droid_please.config import load_config, config
+from droid_please.config import load_config, config, Config
 from droid_please.llm import ResponseChunk, ToolCallChunk, ToolResponse
 from droid_please.tools import read_file, update_file, rename_file, delete_path, ls, create_file
 
@@ -21,12 +23,6 @@ agent_console = Console(style="green italic")
 dim_console = Console(style=Style(dim=True))
 err_console = Console(stderr=True, style="red")
 
-try:
-    load_config()
-except FileNotFoundError as e:
-    err_console.print(str(e))
-    raise SystemExit(1)
-
 
 @app.callback()
 def callback():
@@ -37,10 +33,36 @@ def callback():
 
 
 @app.command()
-def please(command: Annotated[str, typer.Argument()] = None):
+def init(loc: Annotated[Path, typer.Argument()] = Path.cwd()):
+    """
+    Initialize a new .droid directory in the current directory with required configuration files.
+    """
+    droid_dir = loc.joinpath(".droid")
+    try:
+        droid_dir.mkdir(parents=True, exist_ok=False)
+    except FileExistsError:
+        err_console.print(f"Directory {droid_dir} already exists")
+        raise SystemExit(1)
+    
+    # Create an empty config.yaml
+    config_yaml = droid_dir.joinpath("config.yaml")
+    Config(project_root=str(loc)).write(config_yaml)
+    load_config()
+
+    if not os.getenv("ANTHROPIC_API_KEY"):
+        # prompt for the api key. not required but recommended
+        api_key = typer.prompt("Anthropic API key (optional)", default="", hide_input=True)
+        if api_key:
+            with open(droid_dir.joinpath(".env"), "w") as f:
+                f.write(f"ANTHROPIC_API_KEY={api_key}")
+
+
+@app.command()
+def please(command: Annotated[Optional[str], typer.Argument()] = None):
     """
     Ask the droid to do something.
     """
+    load_config()
     agent = Agent(llm=config().llm())
     while True:
         try:
@@ -52,10 +74,11 @@ def please(command: Annotated[str, typer.Argument()] = None):
 
 
 @app.command(name="continue")
-def continue_(command: Annotated[str, typer.Argument()] = None):
+def continue_(command: Annotated[Optional[str], typer.Argument()] = None):
     """
     Ask the droid to do something.
     """
+    load_config()
     agent = Agent.load(
         Path(config().project_root).joinpath(".droid/conversation.yaml"),
         llm=config().llm(),
