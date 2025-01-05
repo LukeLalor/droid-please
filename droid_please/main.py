@@ -192,7 +192,6 @@ def execute(agent: Agent, command: str):
     finally:
         # Run post-execution hooks
         agent.save(Path(config().project_root).joinpath(".droid"))
-        print("running post execution hooks")
         _run_hooks(config().post_execution_hooks)
 
 
