@@ -1,6 +1,6 @@
 model: claude-3-5-sonnet-latest
 max_tokens: 8192
-pre_execution_hooks:
-  - "git diff-index --quiet HEAD || git commit -am 'pre droid stash'"
-post_execution_hook:
-  - "git diff-index --quiet HEAD || git commit -am 'droid activity'"
+#pre_execution_hooks:
+#  - "git diff-index --quiet HEAD || git commit -am 'pre droid stash'"
+#post_execution_hooks:
+#  - "git diff-index --quiet HEAD || git commit -am 'droid activity'"
