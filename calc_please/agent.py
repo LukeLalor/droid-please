@@ -32,7 +32,9 @@ class Agent:
             for tc in tool_calls:
                 raise NotImplementedError("tool calls not yet implemented")
             agent_response = []
-            for chunk in self._llm.stream(messages=boot_messages+self.messages, tools=tools):
+            for chunk in self._llm.stream(
+                messages=boot_messages + self.messages, tools=tools
+            ):
                 started = True
                 if isinstance(chunk, ToolCall):
                     tool_calls.append(chunk)
@@ -41,7 +43,9 @@ class Agent:
                 else:
                     raise NotImplementedError("unknown chunk type")
                 yield chunk
-            agent_response = MessageParam(content="".join([r.content for r in agent_response]), role="assistant")
+            agent_response = MessageParam(
+                content="".join([r.content for r in agent_response]), role="assistant"
+            )
             self.messages.append(agent_response)
 
     def clone(self) -> Agent:
