@@ -8,7 +8,7 @@ from droid_please.tools import (
     read_file,
     update_file,
     rename_file,
-    delete_file,
+    delete_path,
     ls, Update,
 )
 
@@ -51,7 +51,7 @@ def test_rename_file(config):
 
 def test_delete_file(config):
     create_file("to_delete.txt", ["content"])
-    delete_file("to_delete.txt")
+    delete_path("to_delete.txt")
     assert not Path(config.project_root).joinpath("to_delete.txt").exists()
 
 

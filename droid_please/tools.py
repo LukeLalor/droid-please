@@ -1,8 +1,10 @@
 from pathlib import Path
 from typing import List
+import shutil
 
 from anthropic import BaseModel
 from droid_please.config import config
+
 
 
 def _check_file_path(file_path: str):
@@ -103,14 +105,18 @@ def update_file(file_path: str, updates: List[Update]):
     return read_file(file_path)
 
 
-def delete_file(file_path: str):
+def delete_path(path: str):
     """
-    Delete a file.
+    Delete a file or directory.
     """
-    _check_file_path(file_path)
-    loc = Path(config().project_root).joinpath(file_path)
-    loc.unlink()
-    return f"Deleted {file_path}"
+    _check_file_path(path)
+    loc = Path(config().project_root).joinpath(path)
+    if loc.is_dir():
+        shutil.rmtree(loc)
+        return f"Deleted directory {path}"
+    else:
+        loc.unlink()
+        return f"Deleted file {path}"
 
 
 def ls(path: str = ""):
