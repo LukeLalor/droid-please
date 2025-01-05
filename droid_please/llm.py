@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import TypeVar, Type, List, Generator, Iterable
+from typing import TypeVar, Type, List, Generator, Iterable, Any
 
 from anthropic import Anthropic, TextEvent, InputJsonEvent
 from anthropic.types import (
@@ -26,7 +26,8 @@ class ToolCallChunk(BaseModel):
 
 class ToolResponse(BaseModel):
     id: str
-    response: str
+    response: Any
+    is_error: bool
 
 
 class LLM(ABC):

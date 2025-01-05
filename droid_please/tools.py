@@ -50,6 +50,18 @@ class Update(BaseModel):
     content: str
 
 
+def rename_file(old_path: str, new_path: str):
+    """
+    Rename a file.
+    """
+    _check_file_path(old_path)
+    _check_file_path(new_path)
+    old_loc = Path(config().project_root).joinpath(old_path)
+    new_loc = Path(config().project_root).joinpath(new_path)
+    old_loc.rename(new_loc)
+    return f"Renamed {old_path} to {new_path}"
+
+
 def update_file(file_path: str, updates: List[Update]):
     """
     Update a file with the given updates. Each update is a tuple of the line number to replace and the new content.
@@ -78,3 +90,24 @@ def update_file(file_path: str, updates: List[Update]):
     with open(loc, "w") as f:
         f.write("\n".join(acc))
     return read_file(file_path)
+
+
+def delete_file(file_path: str):
+    """
+    Delete a file.
+    """
+    _check_file_path(file_path)
+    loc = Path(config().project_root).joinpath(file_path)
+    loc.unlink()
+    return f"Deleted {file_path}"
+
+
+def ls(path: str = ""):
+    """
+    List contents of a directory.
+    """
+    _check_file_path(path)
+    loc = Path(config().project_root).joinpath(path)
+    if not loc.exists():
+        raise FileNotFoundError(f"Directory not found: {path}")
+    return [dict(name=p.name, is_dir=p.is_dir()) for p in loc.iterdir()]

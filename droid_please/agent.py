@@ -81,7 +81,7 @@ class Agent:
                             tool_response = tools[block[0].tool].execute(tc_args)
                             is_error = False
                         except Exception as e:
-                            tool_response = str(e)
+                            tool_response = e
                             is_error = True
                         block_acc.append(
                             ToolUseBlockParam(
@@ -95,9 +95,14 @@ class Agent:
                             ToolResultBlockParam(
                                 tool_use_id=block[0].id,
                                 type="tool_result",
-                                content=tool_response,
+                                content=str(tool_response),
                                 is_error=is_error,
                             )
+                        )
+                        yield ToolResponse(
+                            id=block[0].id,
+                            response=tool_response,
+                            is_error=is_error,
                         )
                     else:
                         raise NotImplementedError("unknown chunk type")
