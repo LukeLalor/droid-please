@@ -46,8 +46,9 @@ def create_file(file_path: str, contents: str):
 
 
 class Update(BaseModel):
-    replace_lines: Tuple[int, int]
-    content: str
+    insert_line: int
+    replace_until_line: int
+    content: List[str]
 
 
 def rename_file(old_path: str, new_path: str):
@@ -68,8 +69,8 @@ def update_file(file_path: str, updates: List[Update]):
     The second element of the tuple is exclusive, so to purely insert content, use the same line number for both.
     If multiple updates are give, lines numbers always refer to the original file before any updates are applied.
     Examples:
-        {"replace_lines": (1, 4), "content": "new content"} will replace lines 1, 2, and 3 with "new content".
-        {"replace_lines": (1, 1), "content": "new content"} will insert "new content" at line 1. Existing content will all be pushed down a line
+        {"file_path": "foo.txt", "updates": [{"insert_line": 1, "replace_until_line": 4, "content": ["new content"]}]} will replace lines 1, 2, and 3 with "new content".
+        {"file_path": "foo.txt", "updates": [{"insert_line": 1, "replace_until_line": 1, "content": ["new content"]}]} will insert "new content" at line 1. Existing content will all be pushed down a line but otherwise remain unchanged.
     """
     _check_file_path(file_path)
     loc = Path(config().project_root).joinpath(file_path)
