@@ -1,16 +1,13 @@
 import os
 import readline
+import subprocess
 import time
 from pathlib import Path
-from typing import Annotated, Optional, List
 from typing import Annotated, Optional, List
 
 import typer
 from anthropic import AuthenticationError
 from anthropic.types import MessageParam
-from rich.console import Console
-from rich.style import Style
-
 from droid_please.agent import Agent
 from droid_please.agent_tools import (
     read_file,
@@ -22,6 +19,8 @@ from droid_please.agent_tools import (
 )
 from droid_please.config import load_config, config, Config
 from droid_please.llm import ResponseChunk, ToolCallChunk, ToolResponse
+from rich.console import Console
+from rich.style import Style
 
 assert readline  # importing this allows better cli experience, assertion to prevent optimize imports from removing it
 
@@ -135,7 +134,22 @@ def execution_loop(agent, interactive, prompt):
         execute(agent, prompt)
 
 
+def _run_hooks(hooks: list[str]):
+    for hook in hooks:
+        try:
+            result = subprocess.run(hook, shell=True, capture_output=True, text=True)
+        except Exception as e:
+            err_console.print(f"Error executing hook: {hook}")
+            err_console.print(str(e))
+            raise SystemExit(1)
+        if result.returncode != 0:
+            err_console.print(f"Hook failed: {hook}")
+            err_console.print(result.stderr)
+            raise SystemExit(1)
+
+
 def execute(agent: Agent, command: str):
+    _run_hooks(config().pre_execution_hooks)
     status = console.status("thinking...")
     status.start()
     last_chunk = None
@@ -176,7 +190,9 @@ def execute(agent: Agent, command: str):
         err_console.print("Received Authentication error from Anthropic:", e)
         raise SystemExit(1)
     finally:
+        # Run post-execution hooks
         agent.save(Path(config().project_root).joinpath(".droid"))
+        _run_hooks(config().post_execution_hooks)
 
 
 if __name__ == "__main__":
