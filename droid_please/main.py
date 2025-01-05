@@ -5,14 +5,14 @@ from pathlib import Path
 from typing import Annotated, Optional
 
 import typer
-import yaml
 from anthropic.types import MessageParam
 from rich.console import Console
 from rich.style import Style
+
 from droid_please.agent import Agent
+from droid_please.agent_tools import read_file, update_file, rename_file, delete_path, ls, create_file
 from droid_please.config import load_config, config, Config
 from droid_please.llm import ResponseChunk, ToolCallChunk, ToolResponse
-from droid_please.tools import read_file, update_file, rename_file, delete_path, ls, create_file
 
 assert readline  # importing this allows better cli experience, assertion to prevent optimize imports from removing it
 

@@ -22,7 +22,7 @@ class Config(BaseModel):
 
     def write(self, path: Path):
         with open(path, "w") as f:
-            yaml.dump(self.model_dump(exclude={"project_root"}), f)
+            yaml.dump(self.model_dump(exclude={"project_root"}), f, sort_keys=False)
 
 
 _config: Config = None

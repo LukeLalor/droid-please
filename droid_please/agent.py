@@ -139,6 +139,7 @@ class Agent:
                 dict(boot_messages=self.boot_messages, messages=self.messages),
                 f,
                 sort_keys=False,
+                default_flow_style=False,
             )
 
     @staticmethod
