@@ -94,9 +94,10 @@ def execution_loop(agent: Agent, command: str):
                 or chunk.id != last_chunk.id
             ):
                 dim_console.print("\n", "calling tool ", chunk.tool, sep="", end="")
+                t0 = t1
             elif chunk.content and (t1 - t0) > 0.2:
                 dim_console.print(".", end="")
-            t0 = t1
+                t0 = t1
         elif isinstance(chunk, ToolResponse):
             if chunk.is_error:
                 err_console.print(chunk.response)

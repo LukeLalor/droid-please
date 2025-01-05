@@ -22,12 +22,15 @@ def read_file(file_path: str) -> str:
         raise FileNotFoundError(f"File not found: {file_path}")
     with open(loc, "r") as f:
         limit = 10000
-        lines = f.readlines()
+        content = f.read()
+        lines = content.splitlines()
+        if content.endswith("\n"):
+            lines.append("")
         number_length = len(str(min(len(lines), limit - 1)))
         rtn = "\n".join(
             (
-                f"{i}.{' '*(number_length-len(str(i)))}|{lines[i-1]}"
-                for i in range(1, min(len(lines), limit))
+                f"{i}{' '*(number_length-len(str(i)))}|{lines[i-1]}"
+                for i in range(1, min(len(lines)+1, limit))
             )
         )
         if len(lines) > limit:
@@ -35,14 +38,14 @@ def read_file(file_path: str) -> str:
         return rtn
 
 
-def create_file(file_path: str, contents: str):
+def create_file(file_path: str, lines: List[str]):
     """
     Create a file with the given contents.
     """
     _check_file_path(file_path)
     loc = Path(config().project_root).joinpath(file_path)
     with open(loc, "w") as f:
-        f.write(contents)
+        f.write("\n".join(lines))
 
 
 class Update(BaseModel):
@@ -75,7 +78,7 @@ def update_file(file_path: str, updates: List[Update]):
     _check_file_path(file_path)
     loc = Path(config().project_root).joinpath(file_path)
     with open(loc, "r") as f:
-        lines = f.readlines()
+        lines = f.read().splitlines()
     lines_to_delete = set()
     insertion_points = dict()
     for update in updates:

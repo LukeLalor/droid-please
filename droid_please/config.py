@@ -57,3 +57,4 @@ def load_config(config: Config = None):
 
     global _config
     _config = config
+    return config
