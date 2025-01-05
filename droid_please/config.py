@@ -5,11 +5,20 @@ import yaml
 from dotenv import load_dotenv
 from pydantic import BaseModel
 
+from droid_please.llm import AnthropicLLM
+
 
 class Config(BaseModel):
     model: str = "claude-3-5-sonnet-latest"
     max_tokens: int = 8192
     project_root: str
+
+    def llm(self):
+        return AnthropicLLM(
+            api_key=os.getenv("ANTHROPIC_API_KEY"),
+            model=self.model,
+            max_tokens=self.max_tokens,
+        )
 
 
 _config: Config = None

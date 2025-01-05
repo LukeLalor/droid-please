@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import json
+from os import PathLike
 from typing import List, Generator, Callable, Dict
 
 import jsonschema
@@ -125,7 +126,7 @@ class Agent:
             boot_messages=copy.deepcopy(self.boot_messages),
         )
 
-    def save(self, location: str):
+    def save(self, location: str | PathLike):
         with open(location, "w") as f:
             yaml.dump(
                 dict(boot_messages=self.boot_messages, messages=self.messages),
@@ -134,7 +135,7 @@ class Agent:
             )
 
     @staticmethod
-    def load(location: str, llm: LLM) -> Agent:
+    def load(location: str | PathLike, llm: LLM) -> Agent:
         with open(location, "r") as f:
             data = yaml.load(f, Loader=yaml.SafeLoader)
         agent = Agent(llm=llm, boot_messages=data["boot_messages"])

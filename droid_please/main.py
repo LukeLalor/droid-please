@@ -1,7 +1,8 @@
 import os
 import readline
 import time
-from typing import Annotated
+from pathlib import Path
+from typing import Annotated, Optional
 
 import typer
 from anthropic.types import MessageParam
@@ -41,45 +42,60 @@ def please(command: Annotated[str, typer.Argument()] = None):
     """
     Ask the droid to do something.
     """
-    agent = None
+    agent = Agent(llm=config().llm())
     while True:
-        command = command or typer.prompt(text=">", prompt_suffix="")
-        status = console.status("thinking...")
-        status.start()
-        agent = agent or Agent(
-            llm=AnthropicLLM(
-                api_key=os.getenv("ANTHROPIC_API_KEY"),
-                model=config().model,
-                max_tokens=config().max_tokens,
-            )
-        )
-        last_chunk = None
-        t0 = time.perf_counter()
-        for chunk in agent.stream(
-                messages=[MessageParam(content=command, role="user")],
-                tools=[read_file, update_file, rename_file, delete_file, ls],
-        ):
-            if isinstance(chunk, ResponseChunk):
-                if status:
-                    status.stop()
-                    status = None
-                if not last_chunk or isinstance(last_chunk, ResponseChunk):
-                    agent_console.print(chunk.content, end="")
-                else:
-                    agent_console.print("\n", chunk.content.lstrip(), sep="", end="")
-            elif isinstance(chunk, ToolCallChunk):
-                t1 = time.perf_counter()
-                if not last_chunk or not isinstance(last_chunk, ToolCallChunk) or chunk.id != last_chunk.id:
-                    dim_console.print("\n", "calling tool ", chunk.tool, sep="", end="")
-                elif chunk.content and (t1-t0)*1000 > 200:
-                    dim_console.print(".", end="")
-                t0 = t1
-            elif isinstance(chunk, ToolResponse):
-                if chunk.is_error:
-                    err_console.print(chunk.response)
-            last_chunk = chunk
-        console.print()
-        command = None
+        try:
+            command = command or typer.prompt(text=">", prompt_suffix="")
+            execution_loop(agent, command)
+            command = None
+        finally:
+            agent.save(Path(config().project_root).joinpath(".droid/conversation.yaml"))
+
+
+@app.command(name="continue")
+def continue_(command: Annotated[str, typer.Argument()] = None):
+    """
+    Ask the droid to do something.
+    """
+    agent = Agent.load(Path(config().project_root).joinpath(".droid/conversation.yaml"), llm=config().llm())
+    while True:
+        try:
+            command = command or typer.prompt(text=">", prompt_suffix="")
+            execution_loop(agent, command)
+            command = None
+        finally:
+            agent.save(Path(config().project_root).joinpath(".droid/conversation.yaml"))
+
+
+def execution_loop(agent: Agent, command: str):
+    status = console.status("thinking...")
+    status.start()
+    last_chunk = None
+    t0 = time.perf_counter()
+    for chunk in agent.stream(
+            messages=[MessageParam(content=command, role="user")],
+            tools=[read_file, update_file, rename_file, delete_file, ls],
+    ):
+        if isinstance(chunk, ResponseChunk):
+            if status:
+                status.stop()
+                status = None
+            if not last_chunk or isinstance(last_chunk, ResponseChunk):
+                agent_console.print(chunk.content, end="")
+            else:
+                agent_console.print("\n", chunk.content.lstrip(), sep="", end="")
+        elif isinstance(chunk, ToolCallChunk):
+            t1 = time.perf_counter()
+            if not last_chunk or not isinstance(last_chunk, ToolCallChunk) or chunk.id != last_chunk.id:
+                dim_console.print("\n", "calling tool ", chunk.tool, sep="", end="")
+            elif chunk.content and (t1 - t0) * 1000 > 200:
+                dim_console.print(".", end="")
+            t0 = t1
+        elif isinstance(chunk, ToolResponse):
+            if chunk.is_error:
+                err_console.print(chunk.response)
+        last_chunk = chunk
+    console.print()
 
 
 if __name__ == "__main__":
