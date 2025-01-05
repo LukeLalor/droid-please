@@ -49,6 +49,11 @@ def init(loc: Annotated[Path, typer.Argument()] = Path.cwd()):
     Config(project_root=str(loc)).write(config_yaml)
     load_config()
 
+    # Create a default .gitignore file if it doesn't exist
+    gitignore_path = droid_dir.joinpath(".gitignore")
+    with open(gitignore_path, "w") as f:
+        f.write(".env\nconversation.yaml\n")
+
     if not os.getenv("ANTHROPIC_API_KEY"):
         # prompt for the api key. not required but recommended
         api_key = typer.prompt("Anthropic API key (optional)", default="", hide_input=True)
