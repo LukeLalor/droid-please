@@ -10,7 +10,7 @@ from rich.style import Style
 from droid_please.agent import Agent
 from droid_please.config import load_config, config
 from droid_please.llm import ResponseChunk, ToolCallChunk, ToolResponse
-from droid_please.tools import read_file, update_file, rename_file, delete_file, ls
+from droid_please.tools import read_file, update_file, rename_file, delete_file, ls, create_file
 
 assert readline  # importing this allows better cli experience, assertion to prevent optimize imports from removing it
 
@@ -76,7 +76,7 @@ def execution_loop(agent: Agent, command: str):
     t0 = time.perf_counter()
     for chunk in agent.stream(
         messages=[MessageParam(content=command, role="user")],
-        tools=[read_file, update_file, rename_file, delete_file, ls],
+        tools=[read_file, create_file, update_file, rename_file, delete_file, ls],
     ):
         if isinstance(chunk, ResponseChunk):
             if status:

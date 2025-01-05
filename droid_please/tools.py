@@ -38,12 +38,15 @@ def read_file(file_path: str) -> str:
         return rtn
 
 
-def create_file(file_path: str, lines: List[str]):
+def create_file(file_path: str, lines: List[str], trailing_newline: bool = True):
     """
     Create a file with the given contents.
     """
     _check_file_path(file_path)
     loc = Path(config().project_root).joinpath(file_path)
+    loc.parent.mkdir(parents=True, exist_ok=True)
+    if trailing_newline and (not lines or lines[-1] != ""):
+        lines.append("")
     with open(loc, "w") as f:
         f.write("\n".join(lines))
 
@@ -78,7 +81,10 @@ def update_file(file_path: str, updates: List[Update]):
     _check_file_path(file_path)
     loc = Path(config().project_root).joinpath(file_path)
     with open(loc, "r") as f:
-        lines = f.read().splitlines()
+        content = f.read()
+        lines = content.splitlines()
+    if content.endswith("\n"):
+        lines.append("")
     lines_to_delete = set()
     insertion_lines = dict()
     for update in updates:
