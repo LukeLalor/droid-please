@@ -11,6 +11,8 @@ from droid_please.llm import AnthropicLLM
 class Config(BaseModel):
     model: str = "claude-3-5-sonnet-latest"
     max_tokens: int = 8192
+    pre_execution_hooks: list[str] = []
+    post_execution_hooks: list[str] = []
     project_root: str
 
     def llm(self):
