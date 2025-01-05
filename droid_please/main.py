@@ -1,8 +1,7 @@
-import os
 import readline
 import time
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 from anthropic.types import MessageParam
@@ -10,7 +9,7 @@ from rich.console import Console
 from rich.style import Style
 from droid_please.agent import Agent
 from droid_please.config import load_config, config
-from droid_please.llm import AnthropicLLM, ResponseChunk, ToolCallChunk, ToolResponse
+from droid_please.llm import ResponseChunk, ToolCallChunk, ToolResponse
 from droid_please.tools import read_file, update_file, rename_file, delete_file, ls
 
 assert readline  # importing this allows better cli experience, assertion to prevent optimize imports from removing it
@@ -57,7 +56,10 @@ def continue_(command: Annotated[str, typer.Argument()] = None):
     """
     Ask the droid to do something.
     """
-    agent = Agent.load(Path(config().project_root).joinpath(".droid/conversation.yaml"), llm=config().llm())
+    agent = Agent.load(
+        Path(config().project_root).joinpath(".droid/conversation.yaml"),
+        llm=config().llm(),
+    )
     while True:
         try:
             command = command or typer.prompt(text=">", prompt_suffix="")
@@ -73,8 +75,8 @@ def execution_loop(agent: Agent, command: str):
     last_chunk = None
     t0 = time.perf_counter()
     for chunk in agent.stream(
-            messages=[MessageParam(content=command, role="user")],
-            tools=[read_file, update_file, rename_file, delete_file, ls],
+        messages=[MessageParam(content=command, role="user")],
+        tools=[read_file, update_file, rename_file, delete_file, ls],
     ):
         if isinstance(chunk, ResponseChunk):
             if status:
@@ -86,9 +88,13 @@ def execution_loop(agent: Agent, command: str):
                 agent_console.print("\n", chunk.content.lstrip(), sep="", end="")
         elif isinstance(chunk, ToolCallChunk):
             t1 = time.perf_counter()
-            if not last_chunk or not isinstance(last_chunk, ToolCallChunk) or chunk.id != last_chunk.id:
+            if (
+                not last_chunk
+                or not isinstance(last_chunk, ToolCallChunk)
+                or chunk.id != last_chunk.id
+            ):
                 dim_console.print("\n", "calling tool ", chunk.tool, sep="", end="")
-            elif chunk.content and (t1 - t0) * 1000 > 200:
+            elif chunk.content and (t1 - t0) > 0.2:
                 dim_console.print(".", end="")
             t0 = t1
         elif isinstance(chunk, ToolResponse):

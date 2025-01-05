@@ -5,7 +5,6 @@ import json
 from os import PathLike
 from typing import List, Generator, Callable, Dict
 
-import jsonschema
 import yaml
 from anthropic.types import (
     MessageParam,

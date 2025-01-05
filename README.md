@@ -69,11 +69,3 @@ poetry run pytest
 # Run linter
 poetry run ruff check .
 ```
-
-## License
-
-[License information needed]
-
-## Author
-
-Luke Lalor (lukehlalor@gmail.com)

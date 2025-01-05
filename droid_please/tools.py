@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Tuple, List
+from typing import List
 
 from anthropic import BaseModel
 from droid_please.config import config

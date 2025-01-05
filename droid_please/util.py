@@ -14,7 +14,11 @@ class SchemaWrapper:
 
     def parse(self, data: dict):
         jsonschema.validate(instance=data, schema=self.schema)
-        return {k: self._type_adapters[k].validate_python(v) for k, v in data.items() if k in self._type_adapters}
+        return {
+            k: self._type_adapters[k].validate_python(v)
+            for k, v in data.items()
+            if k in self._type_adapters
+        }
 
 
 def callable_params_as_json_schema(func: Callable) -> SchemaWrapper:
