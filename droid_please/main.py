@@ -3,6 +3,7 @@ import readline
 import time
 from pathlib import Path
 from typing import Annotated, Optional, List
+from typing import Annotated, Optional, List
 
 import typer
 from anthropic import AuthenticationError
@@ -60,7 +61,7 @@ def init(loc: Annotated[Path, typer.Argument()] = Path.cwd()):
     # Create a default .gitignore file if it doesn't exist
     gitignore_path = droid_dir.joinpath(".gitignore")
     with open(gitignore_path, "w") as f:
-        f.write(".env\nconversation.yaml\n")
+        f.write(".env\nconversations/\n")
 
     if not os.getenv("ANTHROPIC_API_KEY"):
         # prompt for the api key. not required but recommended
@@ -107,14 +108,17 @@ def please(
 def continue_(
     prompt: Annotated[List[str], typer.Argument()] = None,
     interactive: Annotated[bool, typer.Option("--interactive", "-i")] = False,
+    conversation: Annotated[Optional[str], typer.Option("--conversation", "-c")] = None,
 ):
     """
     Continue a conversation with the droid.
+    If no conversation ID is provided, continues the most recent conversation.
     """
     _load_config()
     agent = Agent.load(
-        Path(config().project_root).joinpath(".droid/conversation.yaml"),
+        Path(config().project_root).joinpath(".droid"),
         llm=_llm(),
+        conversation_id=conversation,
     )
     execution_loop(agent, interactive, " ".join(prompt) if prompt else None)
 
@@ -173,7 +177,7 @@ def execute(agent: Agent, command: str):
         err_console.print("Received Authentication error from Anthropic:", e)
         raise SystemExit(1)
     finally:
-        agent.save(Path(config().project_root).joinpath(".droid/conversation.yaml"))
+        agent.save(Path(config().project_root).joinpath(".droid"))
 
 
 if __name__ == "__main__":

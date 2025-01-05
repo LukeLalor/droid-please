@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import glob
 import copy
 import json
 from os import PathLike
-from typing import List, Generator, Callable, Dict
+from pathlib import Path
+from typing import List, Generator, Callable, Dict, Optional
 
 import yaml
 from anthropic.types import (
@@ -13,6 +15,8 @@ from anthropic.types import (
     ToolUseBlockParam,
     TextBlockParam,
 )
+
+from droid_please.config import config
 from droid_please.llm import LLM, ToolCallChunk, ResponseChunk, ToolResponse
 from droid_please.util import callable_params_as_json_schema, SchemaWrapper
 
@@ -22,6 +26,7 @@ class Agent:
         self._llm = llm
         self.boot_messages = boot_messages or []
         self.messages = []
+        self.conversation_loc: Optional[Path] = None
 
     def stream(
         self,
@@ -133,8 +138,25 @@ class Agent:
             boot_messages=copy.deepcopy(self.boot_messages),
         )
 
-    def save(self, location: str | PathLike):
-        with open(location, "w") as f:
+    @staticmethod
+    def _get_next_conversation_number(base_dir: str | PathLike) -> Path:
+        """Get the next conversation number based on existing files."""
+        conv_dir = Path(base_dir).joinpath('conversations')
+        existing_files = glob.glob(str(conv_dir.joinpath('*.yaml')))
+        if not existing_files:
+            return conv_dir.joinpath('0001.yaml')
+        numbers = [int(Path(f).stem) for f in existing_files]
+        return conv_dir.joinpath(f'{max(numbers) + 1:04d}.yaml')
+
+    def save(self, base_dir: str | PathLike):
+        conv_dir = Path(base_dir).joinpath('conversations')
+        conv_dir.mkdir(exist_ok=True)
+
+        if not self.conversation_loc:
+            self.conversation_loc = self._get_next_conversation_number(base_dir)
+
+        self.conversation_loc.parent.mkdir(exist_ok=True)
+        with open(conv_dir.joinpath(self.conversation_loc), 'w') as f:
             yaml.dump(
                 dict(boot_messages=self.boot_messages, messages=self.messages),
                 f,
@@ -143,11 +165,23 @@ class Agent:
             )
 
     @staticmethod
-    def load(location: str | PathLike, llm: LLM) -> Agent:
-        with open(location, "r") as f:
+    def load(base_dir: str | PathLike, llm: LLM, conversation_id: str = None) -> Agent:
+        conv_dir = Path(base_dir).joinpath('conversations')
+        if conversation_id:
+            filepath = conv_dir.joinpath(f'{conversation_id}.yaml')
+            if not filepath.exists():
+                raise FileNotFoundError(f'Conversation {conversation_id} not found')
+        else:
+            # Get the latest conversation file
+            conv_files = glob.glob(str(conv_dir.joinpath('*.yaml')))
+            if not conv_files:
+                raise FileNotFoundError('No conversations found')
+            filepath = max(conv_files)
+
+        with open(filepath, 'r') as f:
             data = yaml.load(f, Loader=yaml.SafeLoader)
-        agent = Agent(llm=llm, boot_messages=data["boot_messages"])
-        agent.messages = data["messages"]
+        agent = Agent(llm=llm, boot_messages=data['boot_messages'])
+        agent.messages = data['messages']
         return agent
 
 
