@@ -1,8 +1,15 @@
 from abc import ABC
-from typing import TypeVar, Type, Any, List, Dict, Generator, Iterable
+from typing import TypeVar, Type, Any, List, Dict, Generator, Iterable, Literal
 
-from anthropic import Anthropic, TextEvent
-from anthropic.types import MessageParam, ToolParam
+from anthropic import Anthropic, TextEvent, InputJsonEvent
+from anthropic.types import (
+    MessageParam,
+    ToolParam,
+    RawContentBlockStartEvent,
+    TextBlock,
+    ToolUseBlock,
+    RawContentBlockStopEvent,
+)
 from pydantic import BaseModel
 
 T = TypeVar("T")
@@ -12,11 +19,10 @@ class ResponseChunk(BaseModel):
     content: str
 
 
-class ToolCall(BaseModel):
+class ToolCallChunk(BaseModel):
     id: str
     tool: str
-    args: List[Any]
-    kwargs: Dict[str, Any]
+    content: str
 
 
 class ToolResponse(BaseModel):
@@ -30,12 +36,12 @@ class LLM(ABC):
         messages: Iterable[MessageParam],
         tools: Iterable[ToolParam] = None,
         output: Type[T] = str,
-    ) -> List[ToolCall] | T:
+    ) -> List[ToolCallChunk] | T:
         ...
 
     def stream(
         self, messages: List[MessageParam], tools: List[ToolParam]
-    ) -> Generator[ToolCall | ResponseChunk, None, None]:
+    ) -> Generator[ToolCallChunk | ResponseChunk, None, None]:
         ...
 
 
@@ -54,7 +60,7 @@ class AnthropicLLM(LLM):
 
     def stream(
         self, messages: List[MessageParam], tools: List[ToolParam]
-    ) -> Generator[ToolCall | ResponseChunk, None, None]:
+    ) -> Generator[ToolCallChunk | ResponseChunk, None, None]:
         kwargs = {}
         if messages and messages[0].get("role") == "system":
             kwargs["system"] = messages[0]["content"]
@@ -66,6 +72,17 @@ class AnthropicLLM(LLM):
             max_tokens=self.max_tokens,
             **kwargs,
         ) as chunk_stream:
+            block: RawContentBlockStartEvent = None
             for chunk in chunk_stream:
-                if isinstance(chunk, TextEvent):
-                    yield ResponseChunk(content=chunk.text)
+                if isinstance(chunk, RawContentBlockStartEvent):
+                    block = chunk
+                elif block and isinstance(block.content_block, TextBlock):
+                    if isinstance(chunk, TextEvent):
+                        yield ResponseChunk(content=chunk.text)
+                elif block and isinstance(block.content_block, ToolUseBlock):
+                    if isinstance(chunk, InputJsonEvent):
+                        yield ToolCallChunk(
+                            id=block.content_block.id,
+                            tool=block.content_block.name,
+                            content=chunk.partial_json,
+                        )

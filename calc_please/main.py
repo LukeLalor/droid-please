@@ -6,8 +6,9 @@ import readline
 
 from anthropic.types import MessageParam
 from calc_please.agent import Agent
-from calc_please.llm import AnthropicLLM
+from calc_please.llm import AnthropicLLM, ResponseChunk, ToolCallChunk
 from calc_please.config import load_config, config
+from calc_please.tools import read_file
 
 assert readline  # importing this allows better cli experience, assertion to prevent optimize imports from removing it
 
@@ -55,10 +56,28 @@ def please():
                 max_tokens=config().max_tokens,
             )
         )
-        for chunk in agent.stream([MessageParam(content=command, role="user")]):
-            status.stop()
-            agent_console.print(chunk.content, end="")
-        # add newline
+        active_tool_calls = []
+        for chunk in agent.stream(
+            messages=[MessageParam(content=command, role="user")],
+            tools=[read_file],
+        ):
+            if isinstance(chunk, ResponseChunk):
+                if status:
+                    status.stop()
+                    status = None
+                agent_console.print(chunk.content, end="")
+            elif isinstance(chunk, ToolCallChunk):
+                if chunk.tool not in active_tool_calls:
+                    active_tool_calls.append(chunk.tool)
+                    if status:
+                        status.update(
+                            f"calling tool(s): {', '.join(active_tool_calls)}"
+                        )
+                    else:
+                        status = console.status(
+                            f"calling tools: {', '.join(active_tool_calls)}"
+                        )
+                        status.start()
         agent_console.print()
 
 

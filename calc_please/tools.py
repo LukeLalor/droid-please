@@ -23,8 +23,13 @@ def read_file(file_path: str) -> str:
     with open(loc, "r") as f:
         limit = 10000
         lines = f.readlines()
-        number_length = len(str(min(len(lines), limit-1)))
-        rtn = "\n".join((f"{i-1}.{' '*(number_length-len(str(i)))}|" for i in range(1, max(len(lines), limit))))
+        number_length = len(str(min(len(lines), limit - 1)))
+        rtn = "\n".join(
+            (
+                f"{i}.{' '*(number_length-len(str(i)))}|{lines[i-1]}"
+                for i in range(1, min(len(lines), limit))
+            )
+        )
         if len(lines) > limit:
             rtn += f"\n...{len(lines)-limit} lines not shown"
         return rtn
@@ -73,5 +78,3 @@ def update_file(file_path: str, updates: List[Update]):
     with open(loc, "w") as f:
         f.write("\n".join(acc))
     return read_file(file_path)
-
-
