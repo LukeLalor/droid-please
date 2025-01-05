@@ -14,7 +14,7 @@ from anthropic.types import (
     TextBlockParam,
 )
 from droid_please.llm import LLM, ToolCallChunk, ResponseChunk, ToolResponse
-from droid_please.util import callable_params_as_json_schema
+from droid_please.util import callable_params_as_json_schema, SchemaWrapper
 
 
 class Agent:
@@ -144,7 +144,7 @@ class Agent:
 
 class ToolWrapper:
     _callable: Callable
-    _param_schema: dict
+    _param_schema: SchemaWrapper
 
     def __init__(self, fn: Callable):
         self._callable = fn
@@ -159,13 +159,13 @@ class ToolWrapper:
         return ToolParam(
             name=self._callable.__name__,
             description=self._callable.__doc__,
-            input_schema=self._param_schema,
+            input_schema=self._param_schema.schema,
         )
 
     @staticmethod
     def args(chunks: List[ToolCallChunk]):
         return json.loads("".join([c.content for c in chunks]) or "{}")
 
-    def execute(self, args: dict):
-        jsonschema.validate(instance=args, schema=self._param_schema)
-        return self._callable(**args)
+    def execute(self, data: dict):
+        kwargs = self._param_schema.parse(data)
+        return self._callable(**kwargs)

@@ -79,13 +79,13 @@ def update_file(file_path: str, updates: List[Update]):
     lines_to_delete = set()
     insertion_points = dict()
     for update in updates:
-        for i in range(*update.replace_lines):
+        for i in range(update.insert_line, update.replace_until_line):
             lines_to_delete.add(i)
         insertion_points[update.replace_lines[0]] = update.content
     acc = []
     for i in range(len(lines)):
         if i in insertion_points:
-            acc.append(insertion_points[i])
+            acc.extend(insertion_points[i])
         if i not in lines_to_delete:
             acc.append(lines[i])
     with open(loc, "w") as f:

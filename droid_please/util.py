@@ -1,18 +1,33 @@
 from inspect import signature
-from typing import Callable, get_type_hints
+from typing import Callable, get_type_hints, Dict
 
+import jsonschema
 from pydantic import TypeAdapter
 
 
-def callable_params_as_json_schema(func: Callable) -> dict:
+class SchemaWrapper:
+    schema: dict
+
+    def __init__(self, schema: dict, type_adapters=None):
+        self.schema = schema
+        self._type_adapters: Dict[str, TypeAdapter] = type_adapters or {}
+
+    def parse(self, data: dict):
+        jsonschema.validate(instance=data, schema=self.schema)
+        return {self._type_adapters[k].validate_python(v) for k, v in data.items() if k in self._type_adapters}
+
+
+def callable_params_as_json_schema(func: Callable) -> SchemaWrapper:
     type_hints = get_type_hints(func)
     sig = signature(func)
 
-    properties = {
-        param: TypeAdapter(typ).json_schema()
+    adapters = {
+        param: TypeAdapter(typ)
         for param, typ in type_hints.items()
         if param != "return"
     }
+
+    properties = {p: a.json_schema() for p, a in adapters}
 
     defs = {}
     for schema in properties.values():
@@ -33,4 +48,4 @@ def callable_params_as_json_schema(func: Callable) -> dict:
     if required:
         schema["required"] = required
 
-    return schema
+    return SchemaWrapper(schema, adapters)
