@@ -1,9 +1,11 @@
 # Droid Please
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/LukeLalor/droid-please/test_python.yml?logo=github&label=tests)
+![PyPI - Version](https://img.shields.io/pypi/v/droid-please)
 
 A CLI tool to modify local files. It initializes knowledge per-project that is designed to be checked into version control.
 
 ```
-pip install droid-please --upgrade
+pip install droid-please
 droid --help
     ╭─ Commands ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
     │ init       Initialize a new .droid directory in the current directory with required configuration files.                                                 │
@@ -12,7 +14,7 @@ droid --help
     │ continue   Continue a conversation with the droid. If no conversation file is provided, continues the most recent conversation.                          │
     │ save       Save a version of the latest conversation. If no conversation file is provided, saves the most recent conversation.                           │
     ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-droid please "write tests for me"
+droid please "write tests for ..."
 ```
 
 
