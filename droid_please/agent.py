@@ -98,7 +98,7 @@ class Agent:
                         )
                         try:
                             tool_response_str = (
-                                yaml.dump(tool_response)
+                                yaml.dump(tool_response, allow_unicode=True)
                                 if not isinstance(tool_response, str)
                                 else tool_response
                             )
@@ -161,7 +161,8 @@ class Agent:
                 dict(boot_messages=self.boot_messages, messages=self.messages),
                 f,
                 sort_keys=False,
-                default_flow_style=False,
+                default_style="|",
+                allow_unicode=True,
             )
 
     @staticmethod

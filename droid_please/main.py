@@ -35,7 +35,7 @@ err_console = Console(stderr=True, style="red")
 @app.callback()
 def callback():
     """
-    Droid, your coding ai assistant
+    Droid, your coding AI assistant
     """
     pass
 

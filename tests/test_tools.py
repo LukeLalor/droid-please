@@ -3,14 +3,13 @@ from pathlib import Path
 import pytest
 
 from droid_please.config import load_config, Config
-from droid_please.tools import (
+from droid_please.agent_tools import (
     create_file,
     read_file,
     update_file,
     rename_file,
     delete_path,
-    ls,
-    Update,
+    ls, InsertLines, DeleteLines,
 )
 
 
@@ -37,17 +36,16 @@ def test_update_file(config):
     update_file(
         "foo.txt",
         [
-            Update.model_validate(
-                {"insert_line": 2, "replace_until_line": 3, "content": ["new line2"]}
-            )
+            InsertLines(insertion_index=1, lines=["new line2"])
         ],
+        [DeleteLines(start_line=2, end_line=2)]
     )
     with open(Path(config.project_root).joinpath("foo.txt"), "r") as f:
-        assert f.read() == "line1\nnew line2\nline3"
+        assert f.read() == "line1\nnew line2\nline3\n"
 
 
 def test_rename_file(config):
-    create_file("old.txt", ["content"])
+    create_file("old.txt", ["content"], trailing_newline=False)
     rename_file("old.txt", "new.txt")
     assert not Path(config.project_root).joinpath("old.txt").exists()
     with open(Path(config.project_root).joinpath("new.txt"), "r") as f:
@@ -63,6 +61,6 @@ def test_delete_file(config):
 def test_ls(config):
     create_file("file1.txt", ["content1"])
     create_file("file2.txt", ["content2"])
-    files = ls("")
-    assert "file1.txt" in files
-    assert "file2.txt" in files
+    files = ls()
+    assert "file1.txt" in str(files)
+    assert "file2.txt" in str(files)
