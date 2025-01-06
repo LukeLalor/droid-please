@@ -2,6 +2,19 @@
 
 A CLI tool to modify local files. It initializes knowledge per-project that is designed to be checked into version control.
 
+```
+pip install droid-please --upgrade
+droid --help
+    ╭─ Commands ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+    │ init       Initialize a new .droid directory in the current directory with required configuration files.                                                 │
+    │ learn      Analyze the project structure and learn about its organization and purpose. The summary will be saved to the config file for future reference.│
+    │ please     Ask the droid to do something.                                                                                                                │
+    │ continue   Continue a conversation with the droid. If no conversation file is provided, continues the most recent conversation.                          │
+    │ save       Save a version of the latest conversation. If no conversation file is provided, saves the most recent conversation.                           │
+    ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+droid please "write tests for me"
+```
+
 
 ## Why "Droid Please"?
 
@@ -50,17 +63,6 @@ This will install the `droid` CLI tool on your system. Let's make sure it's inst
 ```bash
 droid --help
 ```
-
-```
-╭─ Commands ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ init       Initialize a new .droid directory in the current directory with required configuration files.                                                 │
-│ learn      Analyze the project structure and learn about its organization and purpose. The summary will be saved to the config file for future reference.│
-│ please     Ask the droid to do something.                                                                                                                │
-│ continue   Continue a conversation with the droid. If no conversation file is provided, continues the most recent conversation.                          │
-│ save       Save a version of the latest conversation. If no conversation file is provided, saves the most recent conversation.                           │
-╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-```
-
 > 🚨 You might need reset or restart your terminal to get the `droid` command to work.
 
 Droid Please also contains (optional) completions:

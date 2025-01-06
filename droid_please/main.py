@@ -22,6 +22,7 @@ from droid_please.conversations import latest_loc_path, next_conversation_number
 from droid_please.llm import ResponseChunk, ToolCallChunk, ToolResponse
 from rich.console import Console
 from rich.style import Style
+from rich.text import Text
 
 assert readline  # importing this allows better cli experience, assertion to prevent optimize imports from removing it
 
@@ -70,6 +71,11 @@ def init(loc: Annotated[Path, typer.Argument()] = Path.cwd()):
             with open(droid_dir.joinpath(".env"), "w") as f:
                 f.write(f"ANTHROPIC_API_KEY={api_key}")
     dim_console.print("Initialized project:", droid_dir)
+    agent_console.print(
+        "Done. Run droid",
+        Text("droid learn", style="bold magenta"),
+        "so I can analyze your project structure and purpose.",
+    )
 
 
 def _load_config():
