@@ -1,63 +1,63 @@
-# Droid Please - AI-Powered Project Management CLI
+# Droid Please - AI Project Management CLI
 
-## Project Overview
-A CLI tool that serves as an AI coding assistant, leveraging Anthropic's Claude to enable natural language interactions for project management and file operations. Users can issue commands in plain English to manipulate files and manage their codebase.
+## Core Purpose
+A command-line interface tool that enables natural language project management through Anthropic's Claude AI. Users can manipulate files and manage codebases using plain English commands instead of traditional CLI syntax.
 
 ## Technical Stack
 - Python 3.10+
 - Key Dependencies:
-  - `anthropic`: Claude AI integration
-  - `typer`: CLI framework
-  - `rich`: Terminal formatting
-  - `pydantic`: Data validation
-  - `poetry`: Dependency management
+  - anthropic: Claude AI integration
+  - typer: CLI framework
+  - rich: Terminal output formatting
+  - pydantic: Data validation
+  - poetry: Dependency management
 
-## Core Components
-1. **CLI Interface** (`main.py`)
-   - Entry point for the application
-   - Handles command routing and user interaction
-   - Implements interactive and direct command modes
+## Project Architecture
 
-2. **Agent System** (`agent.py`)
-   - Manages communication with Claude AI
-   - Handles message streaming and tool execution
-   - Maintains conversation context
+### 1. Core Components
+- `main.py`: CLI entry point and command routing
+- `agent.py`: Claude AI communication and tool execution
+- `agent_tools.py`: Core file operations (read, create, update, delete, list)
+- `config.py`: Configuration management and environment handling
+- `llm.py`: Language model interface abstraction
+- `prompts.py`: System and operation prompts
 
-3. **File Operations** (`agent_tools.py`)
-   - Core file manipulation functions:
-     - read_file: File content reading
-     - create_file: File creation
-     - update_file: Content modification
-     - rename_file: File renaming
-     - delete_path: File/directory deletion
-     - ls: Directory listing
-
-## Project Structure
+### 2. Project Organization
 ```
 droid_please/
-├── main.py         # Application entry point
-├── agent.py        # AI agent implementation
-├── agent_tools.py  # File operation tools
-├── config.py       # Configuration management
-├── llm.py         # Language model interface
-└── util.py        # Utility functions
-
-tests/              # Test suite
-└── test_tools.py   # Tool testing
+├── Core Source Files
+│   ├── main.py         # CLI interface
+│   ├── agent.py        # AI orchestration
+│   ├── agent_tools.py  # File operations
+│   ├── config.py       # Config management
+│   ├── llm.py         # LLM interface
+│   └── util.py        # Utilities
+│
+├── Configuration
+│   ├── pyproject.toml  # Project metadata and dependencies
+│   └── poetry.lock    # Dependency lock file
+│
+└── Tests
+    └── test_tools.py  # Tool testing suite
 ```
 
-## Key Features
+### 3. Key Features
 - Natural language command processing
-- Project-aware file operations
-- Interactive CLI mode
-- Context-aware responses
-- Safe file manipulation within project boundaries
+- Project-aware file operations:
+  - File reading and writing
+  - Directory listing
+  - File creation/deletion
+  - Content updates
+  - File renaming
+- Interactive and direct command modes
+- Project context awareness
 - Configuration management via `.droid` directory
+- Security features (path traversal protection, project boundary enforcement)
 
-## Security Features
-- Project root validation
-- Path traversal protection
-- API key management
-- Controlled file access boundaries
+### 4. Usage Patterns
+- Interactive mode: `droid please`
+- Direct commands: `droid please "command in natural language"`
+- Project initialization: `droid init`
+- Project learning: `droid learn`
 
-The project efficiently combines AI capabilities with practical file system operations, providing a user-friendly interface for common development tasks through natural language commands.
+The project effectively combines AI capabilities with practical file system operations, providing a developer-friendly interface for common project management tasks through natural language interaction.

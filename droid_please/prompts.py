@@ -35,13 +35,21 @@ IMPORTANT DIRECTIVES:
 - FOCUS ON STRUCTURE: Pay special attention to how the project is organized
 - BE SPECIFIC: Include actual file paths and component names
 - BE CONCISE: While thorough, keep the final summary clear and well-organized
+- AUDIENCE: Assume the summary will be used to ground an LLM AI assistant working with the project. Provide the information they will need to be effective.
 
 When you are done with your EXPLORATION and ANALYSIS, respond with "I'm ready to summarize".
+
+Below is the current project context. It may be out of date, so verify the information as you explore the project, but you may use it as a starting point.
+<CURRENT PROJECT CONTEXT>
+{project_summary}
+<END CURRENT PROJECT CONTEXT>
+
 START YOUR EXPLORATION NOW.
 """.strip()
 
 default_summarize_prompt = summarize_prompt = """
 Thank you. Please summarize the project structure and purpose.
 
+AUDIENCE: This summary will be used to ground an LLM AI assistant working with the project. Provide clear and concise information that 
 BE CONCISE: While thorough, keep the summary clear and well-organized. Respond directly with the summary.
 """.strip()
