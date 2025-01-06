@@ -16,7 +16,6 @@ from droid_please.llm import AnthropicLLM
 
 class Config(BaseModel):
     model: str = "claude-3-5-sonnet-latest"
-    project_summary: str | None = None
     max_tokens: int = 8192
     pre_execution_hooks: list[str] = []
     post_execution_hooks: list[str] = []
@@ -26,12 +25,12 @@ class Config(BaseModel):
     project_root: str
 
     def get_system_prompt(self):
-        summary_path = Path(self.project_root).joinpath(".droid").joinpath("system_prompt")
+        summary_path = Path(self.project_root).joinpath(".droid").joinpath("summary.txt")
         try:
-            summary = summary_path.read_text()
+            project_summary = summary_path.read_text()
         except FileNotFoundError:
-            summary = "Project summary has not yet been generated."
-        return self.system_prompt.format(summary=summary)
+            project_summary = "Project summary has not yet been generated."
+        return self.system_prompt.format(project_summary=project_summary)
 
     def llm(self):
         api_key = os.getenv("ANTHROPIC_API_KEY")

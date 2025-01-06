@@ -87,7 +87,9 @@ def _llm():
 
 
 @app.command()
-def learn():
+def learn(
+    save: Annotated[bool, typer.Option("--save", "-s", help="Save conversation state")] = False,
+):
     """
     Analyze the project structure and learn about its organization and purpose.
     The summary will be saved to the config file for future reference.
@@ -97,7 +99,7 @@ def learn():
         llm=_llm(),
         boot_messages=[MessageParam(content=config().get_system_prompt(), role="system")],
     )
-    execute(agent, config().learn_prompt, save=False, tool_override=[ls, read_file])
+    execute(agent, config().learn_prompt, save=save, tool_override=[ls, read_file])
 
     dim_console.print("Summarizing project structure and purpose...")
     chunks = []
