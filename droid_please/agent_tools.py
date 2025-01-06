@@ -54,7 +54,7 @@ def create_file(file_path: str, lines: List[str], trailing_newline: bool = True)
     loc = Path(config().project_root).joinpath(file_path)
     if loc.exists():
         raise FileExistsError(
-            f"File already exists. Update it instead or explicitly delete it first."
+            "File already exists. Update it instead or explicitly delete it first."
         )
     loc.parent.mkdir(parents=True, exist_ok=True)
     if trailing_newline and (not lines or lines[-1] != ""):
@@ -92,7 +92,7 @@ def update_file(
 ):
     """
     Update a file with the given updates. Each update contains either lines to insert or a range of lines to delete.
-    Inserting will insert before the specified line. For example, start_line=0 will insert at the beginning of the file. start_line=4 will insert before line 4, after line 3. This will not delete any lines, including the specified insertion index.
+    Inserting will insert after the specified line. For example, insertion_index 0 will insert at the beginning of the file while insertion_index=1 will insert after line 1, before line 2. insertions will not delete or replace any lines.
     Deleting will delete all lines from start_line to end_line, inclusive. This will only delete lines as they existed BEFORE any insertions.
     """
     insertions = insertions or []

@@ -18,6 +18,7 @@ from droid_please.agent_tools import (
     create_file,
 )
 from droid_please.config import load_config, config, Config
+from droid_please.conversations import latest_loc_path, next_conversation_number
 from droid_please.llm import ResponseChunk, ToolCallChunk, ToolResponse
 from rich.console import Console
 from rich.style import Style
@@ -147,7 +148,14 @@ def continue_(
     If no conversation file is provided, continues the most recent conversation.
     """
     _load_config()
-    agent = Agent.load(loc=conversation, llm=_llm())
+    conversation = conversation or Path(config().project_root).joinpath(
+        ".droid/conversations/latest.yaml"
+    )
+    try:
+        agent = Agent.load(loc=conversation, llm=_llm())
+    except FileNotFoundError:
+        err_console.print(f"Conversation file not found: {conversation}")
+        raise SystemExit(1)
     execution_loop(agent, interactive, " ".join(prompt) if prompt else None, save)
 
 
@@ -156,7 +164,6 @@ def _prompt():
 
 
 def execution_loop(agent, interactive, prompt, save: bool = False):
-    magic_words = {"droid save"}
     if not interactive:
         if not prompt:
             err_console.print("Error: prompt is required in non-interactive mode")
@@ -164,16 +171,9 @@ def execution_loop(agent, interactive, prompt, save: bool = False):
         execute(agent, prompt, save)
     else:
         while interactive:
-            prompt = _prompt()
-            while prompt in magic_words:
-                if prompt == "droid save":
-                    save = True
-                    agent.save(Path(config().project_root).joinpath(".droid"))
-                    dim_console.print("conversation saved")
-                else:
-                    err_console.print("Unknown Command")
-                prompt = _prompt()
+            prompt = prompt or _prompt()
             execute(agent, prompt, save)
+            prompt = None
 
 
 def _run_hooks(hooks: list[str]):
@@ -196,6 +196,7 @@ def execute(agent: Agent, command: str, save: bool = False, tool_override: List[
     status.start()
     last_chunk = None
     t0 = time.perf_counter()
+    save_loc = None
     try:
         for chunk in agent.stream(
             messages=[MessageParam(content=command, role="user")],
@@ -233,10 +234,31 @@ def execute(agent: Agent, command: str, save: bool = False, tool_override: List[
         err_console.print("Received Authentication error from Anthropic:", e)
         raise SystemExit(1)
     finally:
-        # Run post-execution hooks
+        agent.save(latest_loc_path())
         if save:
-            agent.save(Path(config().project_root).joinpath(".droid"))
+            save_loc = save_loc or next_conversation_number()
+            agent.save(save_loc)
         _run_hooks(config().post_execution_hooks)
+
+
+@app.command()
+def save(
+    conversation: Annotated[Optional[Path], typer.Option("--conversation", "-c")] = None,
+):
+    """
+    Save a version of the latest conversation. If no conversation file is provided, saves the most recent conversation.
+    """
+    _load_config()
+    conversation = Path(conversation or latest_loc_path())
+    try:
+        agent = Agent.load(loc=conversation, llm=None)
+    except FileNotFoundError:
+        err_console.print(f"Conversation file not found: {conversation}")
+        raise SystemExit(1)
+    save_loc = next_conversation_number()
+    agent.save(save_loc)
+    agent.save(latest_loc_path())
+    agent_console.print("Saved conversation to", save_loc.relative_to(Path.cwd()))
 
 
 if __name__ == "__main__":
