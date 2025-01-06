@@ -40,9 +40,9 @@ def _read_file(loc, offset, limit):
             )
         )
         if offset > 0:
-            rtn = f"\n({offset} leading lines skipped)\n" + rtn
+            rtn = f"({offset} leading lines skipped)\n" + rtn
         if len(lines) > limit:
-            rtn += f"\n({len(lines) - limit} trailing lines not shown)\n"
+            rtn += f"\n({len(lines) - limit} trailing lines not shown)"
         return rtn
 
 
@@ -84,7 +84,7 @@ def rename_file(old_path: str, new_path: str):
 def update_file(file_path: str, insertions: List[InsertLines] = None, deletions: List[DeleteLines] = None):
     """
     Update a file with the given updates. Each update contains either lines to insert or a range of lines to delete.
-    Inserting will insert at the index of the specified line. For example, start_line=0 will insert at the beginning of the file. start_line=4 will insert before line 4, after line 3.
+    Inserting will insert before the specified line. For example, start_line=0 will insert at the beginning of the file. start_line=4 will insert before line 4, after line 3. This will not delete any lines, including the specified insertion index.
     Deleting will delete all lines from start_line to end_line, inclusive. This will only delete lines as they existed BEFORE any insertions.
     """
     insertions = insertions or []
@@ -119,7 +119,7 @@ def update_file(file_path: str, insertions: List[InsertLines] = None, deletions:
         max_line_effected = max(max_line_effected, max(deletions, key=lambda d: d.end_line).end_line)
     offset = max(min_line_effected-5, 0)
     limit = min((max_line_effected + 5) - min_line_effected, len(lines)-offset)
-    return _read_file(loc, offset, limit)
+    return "Here is the updated portion of the file. If this does not look right please update it again.\n" + _read_file(loc, offset, limit)
 
 
 def delete_path(path: str):

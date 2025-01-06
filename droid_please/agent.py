@@ -27,6 +27,7 @@ class Agent:
         self.boot_messages = boot_messages or []
         self.messages = []
         self.conversation_loc: Optional[Path] = None
+        self._last_used_tools: List[dict] = []
 
     def stream(
         self,
@@ -39,6 +40,7 @@ class Agent:
         tools: Dict[str, ToolWrapper] = {
             tw.name: tw for tw in (ToolWrapper(t) for t in tools or [])
         }
+        self._last_used_tools = [t.tool for t in tools.values()]
         while True:
             agent_response = []
             for chunk in self._llm.stream(
@@ -158,7 +160,7 @@ class Agent:
         self.conversation_loc.parent.mkdir(exist_ok=True)
         with open(conv_dir.joinpath(self.conversation_loc), 'w') as f:
             yaml.dump(
-                dict(boot_messages=self.boot_messages, messages=self.messages),
+                dict(boot_messages=self.boot_messages, messages=self.messages, tools=self._last_used_tools),
                 f,
                 sort_keys=False,
                 default_style="|",
