@@ -1,6 +1,16 @@
 # Droid Please
 
 A simple CLI tool that acts as your AI coding assistant, powered by Anthropic's Claude. It helps you manage your project through natural language commands, allowing you to perform various file operations and coding tasks by simply asking.
+## Why "Droid Please"?
+
+Just as protocol droids in Star Wars serve as helpful assistants and interpreters, `droid please` is your friendly AI assistant for project management. The name is inspired by the etiquette and protocol droids like C-3PO, who are most helpful when treated with courtesy. Hence, we always say "please" when asking our droid for help!
+
+[Insert Meme Here: A split image showing two scenarios:
+Left side: Developer aggressively typing complex git commands with frustrated emojis
+Right side: Developer calmly saying "droid please update my git config" with C-3PO giving a thumbs up]
+
+Remember: A polite developer is a productive developer! 😊
+
 
 ## Quick Start
 
@@ -45,6 +55,26 @@ poetry install
 ```
 
 ## Configuration
+## Getting Started
+
+### Project Initialization
+```bash
+# Initialize droid in your project
+droid init
+
+# This creates a .droid directory with project-specific settings
+# and helps the AI understand your project structure
+```
+
+### Project Learning
+```bash
+# Let droid learn about your project
+droid learn
+
+# This analyzes your project structure, dependencies,
+# and common patterns to provide better assistance
+```
+
 
 1. Get an API key from [Anthropic](https://www.anthropic.com/)
 2. Set up your Anthropic API key as an environment variable:
@@ -61,6 +91,23 @@ You can also add this to your `.bashrc`, `.zshrc`, or equivalent to make it perm
 droid please
 ```
 This starts an interactive session where you can type commands in natural language.
+
+In interactive mode, you can:
+- Ask questions about your project
+- Request file operations
+- Get coding suggestions
+- Manage project dependencies
+- Receive contextual help
+
+The droid maintains context between commands, so you can have natural conversations:
+```
+You: Show me what's in the src directory
+Droid: [Lists contents]
+You: Great, read the main.py file
+Droid: [Shows content of src/main.py]
+You: Update the version number in that file
+```
+
 
 ### Direct Commands
 ```bash

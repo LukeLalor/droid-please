@@ -14,4 +14,4 @@ def next_conversation_number() -> Path:
     if not existing_files:
         return conv_dir.joinpath("0001.yaml")
     numbers = [int(name) for name in (Path(f).stem for f in existing_files) if name.isdigit()]
-    return conv_dir.joinpath(f"{max(numbers) + 1:04d}.yaml")
+    return conv_dir.joinpath(f"{max(numbers, default=0) + 1:04d}.yaml")

@@ -1,6 +1,7 @@
 from inspect import signature
 from typing import Callable, get_type_hints, Dict
 
+import jsonref
 import jsonschema
 from pydantic import TypeAdapter
 
@@ -46,4 +47,6 @@ def callable_params_as_json_schema(func: Callable) -> SchemaWrapper:
     if required:
         schema["required"] = required
 
-    return SchemaWrapper(schema, adapters)
+    # LLMs have trouble following refs, so we inline them
+    inlined_def_schema = dict(jsonref.JsonRef.replace_refs(schema))
+    return SchemaWrapper(inlined_def_schema, adapters)
