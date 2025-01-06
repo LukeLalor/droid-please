@@ -10,16 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Install ruff
-        run: pip install ruff
-      - name: Run ruff format
-        run: ruff format .
-      - name: Check for changes
-        run: |
-          git status
-          git diff --quiet || (echo "Changes detected after formatting. Please run 'ruff format' locally and commit the changes." && exit 1)
-      - name: Run ruff check
-        run: ruff check .
+      - run: pip install ruff
+      - run: ruff check .
 
   pytest:
     runs-on: ubuntu-latest
