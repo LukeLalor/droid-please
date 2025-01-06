@@ -94,13 +94,14 @@ def _llm():
 def please(
     prompt: Annotated[List[str], typer.Argument()] = None,
     interactive: Annotated[bool, typer.Option("--interactive", "-i")] = False,
+    save: Annotated[bool, typer.Option("--save", "-s", help="Save conversation state")] = False,
 ):
     """
     Ask the droid to do something.
     """
     _load_config()
     agent = Agent(llm=_llm())
-    execution_loop(agent, interactive, " ".join(prompt) if prompt else None)
+    execution_loop(agent, interactive, " ".join(prompt) if prompt else None, save)
 
 
 @app.command(name="continue")
@@ -108,6 +109,7 @@ def continue_(
     prompt: Annotated[List[str], typer.Argument()] = None,
     interactive: Annotated[bool, typer.Option("--interactive", "-i")] = False,
     conversation: Annotated[Optional[Path], typer.Option("--conversation", "-c")] = None,
+    save: Annotated[bool, typer.Option("--save", "-s", help="Save conversation state")] = False,
 ):
     """
     Continue a conversation with the droid.
@@ -118,20 +120,20 @@ def continue_(
         loc=conversation,
         llm=_llm(),
     )
-    execution_loop(agent, interactive, " ".join(prompt) if prompt else None)
+    execution_loop(agent, interactive, " ".join(prompt) if prompt else None, save)
 
 
-def execution_loop(agent, interactive, prompt):
+def execution_loop(agent, interactive, prompt, save: bool = False):
     if not prompt:
         if not interactive:
             err_console.print("Error: prompt is required in non-interactive mode")
             raise SystemExit(1)
         else:
             prompt = typer.prompt(text=">", prompt_suffix="")
-    execute(agent, prompt)
+    execute(agent, prompt, save)
     while interactive:
         prompt = typer.prompt(text=">", prompt_suffix="")
-        execute(agent, prompt)
+        execute(agent, prompt, save)
 
 
 def _run_hooks(hooks: list[str]):
@@ -148,7 +150,7 @@ def _run_hooks(hooks: list[str]):
             raise SystemExit(1)
 
 
-def execute(agent: Agent, command: str):
+def execute(agent: Agent, command: str, save: bool = False):
     _run_hooks(config().pre_execution_hooks)
     status = console.status("thinking...")
     status.start()
@@ -191,7 +193,8 @@ def execute(agent: Agent, command: str):
         raise SystemExit(1)
     finally:
         # Run post-execution hooks
-        agent.save(Path(config().project_root).joinpath(".droid"))
+        if save:
+            agent.save(Path(config().project_root).joinpath(".droid"))
         _run_hooks(config().post_execution_hooks)
 
 
