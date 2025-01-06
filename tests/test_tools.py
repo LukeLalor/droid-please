@@ -9,7 +9,9 @@ from droid_please.agent_tools import (
     update_file,
     rename_file,
     delete_path,
-    ls, InsertLines, DeleteLines,
+    ls,
+    InsertLines,
+    DeleteLines,
 )
 
 
@@ -35,10 +37,8 @@ def test_update_file(config):
     create_file("foo.txt", ["line1", "line2", "line3"])
     update_file(
         "foo.txt",
-        [
-            InsertLines(insertion_index=1, lines=["new line2"])
-        ],
-        [DeleteLines(start_line=2, end_line=2)]
+        [InsertLines(insertion_index=1, lines=["new line2"])],
+        [DeleteLines(start_line=2, end_line=2)],
     )
     with open(Path(config.project_root).joinpath("foo.txt"), "r") as f:
         assert f.read() == "line1\nnew line2\nline3\n"

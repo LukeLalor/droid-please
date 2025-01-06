@@ -20,7 +20,6 @@ from droid_please.agent_tools import (
 from droid_please.config import load_config, config, Config
 from droid_please.llm import ResponseChunk, ToolCallChunk, ToolResponse
 from rich.console import Console
-from rich.live import Live
 from rich.style import Style
 
 assert readline  # importing this allows better cli experience, assertion to prevent optimize imports from removing it
@@ -65,9 +64,7 @@ def init(loc: Annotated[Path, typer.Argument()] = Path.cwd()):
 
     if not os.getenv("ANTHROPIC_API_KEY"):
         # prompt for the api key. not required but recommended
-        api_key = typer.prompt(
-            "Anthropic API key (optional)", default="", show_default=False
-        )
+        api_key = typer.prompt("Anthropic API key (optional)", default="", show_default=False)
         if api_key:
             with open(droid_dir.joinpath(".env"), "w") as f:
                 f.write(f"ANTHROPIC_API_KEY={api_key}")
@@ -77,9 +74,7 @@ def _load_config():
     try:
         load_config()
     except FileNotFoundError:
-        err_console.print(
-            'Could not find .droid directory. Run "droid init" to create one.'
-        )
+        err_console.print('Could not find .droid directory. Run "droid init" to create one.')
         raise SystemExit(1)
 
 
@@ -98,39 +93,18 @@ def learn():
     The summary will be saved to the config file for future reference.
     """
     _load_config()
-    agent = Agent(llm=_llm())
-    learn_prompt = """
-    You are being asked to analyze and understand this project's structure and purpose. 
-    Your task is to:
-    1. EXPLORE: Systematically examine the project files and directories
-    2. ANALYZE: Understand the project's:
-       - Core purpose and functionality
-       - Technical stack and dependencies
-       - Key components and their relationships
-       - Project organization and architecture
-    3. SUMMARIZE: Create a comprehensive yet concise summary that a new developer would find helpful
-
-    IMPORTANT DIRECTIVES:
-    - BE THOROUGH: Use the ls and read_file tools to examine ALL relevant files
-    - BE SYSTEMATIC: Start with high-level files then dive into source code
-    - FOCUS ON STRUCTURE: Pay special attention to how the project is organized
-    - BE SPECIFIC: Include actual file paths and component names
-    - BE CONCISE: While thorough, keep the final summary clear and well-organized
-
-    When you are done with your EXPLORATION and ANALYSIS, respond with "I'm ready to summarize".
-    START YOUR EXPLORATION NOW.
-    """
-
-    summarize_prompt = """
-    Thank you. Please summarize the project structure and purpose.
-    
-    BE CONCISE: While thorough, keep the summary clear and well-organized. Respond directly with the summary.
-    """
-    execute(agent, learn_prompt, save=False, tool_override=[ls, read_file])
+    agent = Agent(
+        llm=_llm(),
+        boot_messages=[MessageParam(content=config().get_system_prompt(), role="system")],
+    )
+    execute(agent, config().learn_prompt, save=False, tool_override=[ls, read_file])
 
     dim_console.print("Summarizing project structure and purpose...")
     chunks = []
-    for chunk in agent.stream(messages=[MessageParam(content=summarize_prompt, role="user")], tools=[ls, read_file]):
+    for chunk in agent.stream(
+        messages=[MessageParam(content=config().summarize_prompt, role="user")],
+        tools=[ls, read_file],
+    ):
         if isinstance(chunk, ResponseChunk):
             chunks.append(chunk.content)
             agent_console.print(chunk.content, end="")
@@ -142,6 +116,7 @@ def learn():
     dim_console.print("Done.")
 
 
+@app.command()
 def please(
     prompt: Annotated[List[str], typer.Argument()] = None,
     interactive: Annotated[bool, typer.Option("--interactive", "-i")] = False,
@@ -151,7 +126,10 @@ def please(
     Ask the droid to do something.
     """
     _load_config()
-    agent = Agent(llm=_llm())
+    agent = Agent(
+        llm=_llm(),
+        boot_messages=[MessageParam(content=config().get_system_prompt(), role="system")],
+    )
     execution_loop(agent, interactive, " ".join(prompt) if prompt else None, save)
 
 
@@ -167,10 +145,7 @@ def continue_(
     If no conversation ID is provided, continues the most recent conversation.
     """
     _load_config()
-    agent = Agent.load(
-        loc=conversation,
-        llm=_llm(),
-    )
+    agent = Agent.load(loc=conversation, llm=_llm())
     execution_loop(agent, interactive, " ".join(prompt) if prompt else None, save)
 
 
@@ -179,14 +154,11 @@ def _prompt():
 
 
 def execution_loop(agent, interactive, prompt, save: bool = False):
-    magic_words = set("droid save")
-    if not prompt:
-        if not interactive:
+    magic_words = {"droid save"}
+    if not interactive:
+        if not prompt:
             err_console.print("Error: prompt is required in non-interactive mode")
             raise SystemExit(1)
-        else:
-            prompt = _prompt()
-    if not interactive:
         execute(agent, prompt, save)
     else:
         while interactive:
@@ -195,7 +167,7 @@ def execution_loop(agent, interactive, prompt, save: bool = False):
                 if prompt == "droid save":
                     save = True
                     agent.save(Path(config().project_root).joinpath(".droid"))
-                    dim_console.print("Conversation saved.")
+                    dim_console.print("conversation saved")
                 else:
                     err_console.print("Unknown Command")
                 prompt = _prompt()
@@ -225,7 +197,8 @@ def execute(agent: Agent, command: str, save: bool = False, tool_override: List[
     try:
         for chunk in agent.stream(
             messages=[MessageParam(content=command, role="user")],
-            tools=tool_override or [read_file, create_file, update_file, rename_file, delete_path, ls],
+            tools=tool_override
+            or [read_file, create_file, update_file, rename_file, delete_path, ls],
         ):
             if isinstance(chunk, ResponseChunk):
                 if status:

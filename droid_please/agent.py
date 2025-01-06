@@ -56,17 +56,13 @@ class Agent:
                         agent_response.append([])
                     agent_response[-1].append(chunk)
                 elif isinstance(chunk, ResponseChunk):
-                    if not agent_response or not isinstance(
-                        agent_response[-1][-1], ResponseChunk
-                    ):
+                    if not agent_response or not isinstance(agent_response[-1][-1], ResponseChunk):
                         agent_response.append([])
                     agent_response[-1].append(chunk)
                 else:
                     raise NotImplementedError("unknown chunk type")
                 yield chunk
-            if len(agent_response) == 1 and isinstance(
-                agent_response[0][0], ResponseChunk
-            ):
+            if len(agent_response) == 1 and isinstance(agent_response[0][0], ResponseChunk):
                 join = "".join([r.content for r in agent_response[0]])
                 self.messages.append(MessageParam(content=join, role="assistant"))
                 break
@@ -143,24 +139,28 @@ class Agent:
     @staticmethod
     def _get_next_conversation_number(base_dir: str | PathLike) -> Path:
         """Get the next conversation number based on existing files."""
-        conv_dir = Path(base_dir).joinpath('conversations')
-        existing_files = glob.glob(str(conv_dir.joinpath('*.yaml')))
+        conv_dir = Path(base_dir).joinpath("conversations")
+        existing_files = glob.glob(str(conv_dir.joinpath("*.yaml")))
         if not existing_files:
-            return conv_dir.joinpath('0001.yaml')
+            return conv_dir.joinpath("0001.yaml")
         numbers = [int(Path(f).stem) for f in existing_files]
-        return conv_dir.joinpath(f'{max(numbers) + 1:04d}.yaml')
+        return conv_dir.joinpath(f"{max(numbers) + 1:04d}.yaml")
 
     def save(self, base_dir: str | PathLike):
-        conv_dir = Path(base_dir).joinpath('conversations')
+        conv_dir = Path(base_dir).joinpath("conversations")
         conv_dir.mkdir(exist_ok=True)
 
         if not self.conversation_loc:
             self.conversation_loc = self._get_next_conversation_number(base_dir)
 
         self.conversation_loc.parent.mkdir(exist_ok=True)
-        with open(conv_dir.joinpath(self.conversation_loc), 'w') as f:
+        with open(conv_dir.joinpath(self.conversation_loc), "w") as f:
             yaml.dump(
-                dict(boot_messages=self.boot_messages, messages=self.messages, tools=self._last_used_tools),
+                dict(
+                    boot_messages=self.boot_messages,
+                    messages=self.messages,
+                    tools=self._last_used_tools,
+                ),
                 f,
                 sort_keys=False,
                 default_style="|",
@@ -171,17 +171,19 @@ class Agent:
     def load(loc: str | PathLike, llm: LLM) -> Agent:
         if not loc:
             # Get the latest conversation file
-            conversation_dir = Path(config().project_root).joinpath('.droid/conversations')
-            pattern = str(conversation_dir.joinpath('*.yaml'))
+            conversation_dir = Path(config().project_root).joinpath(".droid/conversations")
+            pattern = str(conversation_dir.joinpath("*.yaml"))
             conv_files = glob.glob(pattern)
             if not conv_files:
-                raise FileNotFoundError('No conversations found')
-            loc = max(conv_files)  # since conversations are prefixed with numbers, this will get the latest
+                raise FileNotFoundError("No conversations found")
+            loc = max(
+                conv_files
+            )  # since conversations are prefixed with numbers, this will get the latest
 
-        with open(loc, 'r') as f:
+        with open(loc, "r") as f:
             data = yaml.load(f, Loader=yaml.SafeLoader)
-        agent = Agent(llm=llm, boot_messages=data['boot_messages'])
-        agent.messages = data['messages']
+        agent = Agent(llm=llm, boot_messages=data["boot_messages"])
+        agent.messages = data["messages"]
         return agent
 
 

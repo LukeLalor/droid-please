@@ -4,6 +4,11 @@ from typing import Optional
 
 import yaml
 from dotenv import load_dotenv
+from droid_please.prompts import (
+    default_system_prompt,
+    default_learn_prompt,
+    default_summarize_prompt,
+)
 from pydantic import BaseModel
 
 from droid_please.llm import AnthropicLLM
@@ -15,7 +20,18 @@ class Config(BaseModel):
     max_tokens: int = 8192
     pre_execution_hooks: list[str] = []
     post_execution_hooks: list[str] = []
+    system_prompt: str = default_system_prompt
+    learn_prompt: str = default_learn_prompt
+    summarize_prompt: str = default_summarize_prompt
     project_root: str
+
+    def get_system_prompt(self):
+        summary_path = Path(self.project_root).joinpath(".droid").joinpath("system_prompt")
+        try:
+            summary = summary_path.read_text()
+        except FileNotFoundError:
+            summary = "Project summary has not yet been generated."
+        return self.system_prompt.format(summary=summary)
 
     def llm(self):
         api_key = os.getenv("ANTHROPIC_API_KEY")

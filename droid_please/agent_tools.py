@@ -52,6 +52,10 @@ def create_file(file_path: str, lines: List[str], trailing_newline: bool = True)
     """
     _check_file_path(file_path)
     loc = Path(config().project_root).joinpath(file_path)
+    if loc.exists():
+        raise FileExistsError(
+            f"File already exists. Update it instead or explicitly delete it first."
+        )
     loc.parent.mkdir(parents=True, exist_ok=True)
     if trailing_newline and (not lines or lines[-1] != ""):
         lines.append("")
@@ -81,7 +85,11 @@ def rename_file(old_path: str, new_path: str):
     return f"Renamed {old_path} to {new_path}"
 
 
-def update_file(file_path: str, insertions: List[InsertLines] = None, deletions: List[DeleteLines] = None):
+def update_file(
+    file_path: str,
+    insertions: List[InsertLines] = None,
+    deletions: List[DeleteLines] = None,
+):
     """
     Update a file with the given updates. Each update contains either lines to insert or a range of lines to delete.
     Inserting will insert before the specified line. For example, start_line=0 will insert at the beginning of the file. start_line=4 will insert before line 4, after line 3. This will not delete any lines, including the specified insertion index.
@@ -121,9 +129,12 @@ def update_file(file_path: str, insertions: List[InsertLines] = None, deletions:
     if deletions:
         potential_min_lines.append(min(deletions, key=lambda d: d.start_line).start_line)
         potential_max_lines.append(max(deletions, key=lambda d: d.end_line).end_line)
-    offset = max(min(potential_min_lines)-5, 0)
+    offset = max(min(potential_min_lines) - 5, 0)
     limit = min((max(potential_max_lines) + 5), len(lines)) - offset
-    return "Here is the updated portion of the file. If this does not look right please update it again.\n" + _read_file(loc, offset, limit)
+    return (
+        "Here is the updated portion of the file. If this does not look right please update it again.\n"
+        + _read_file(loc, offset, limit)
+    )
 
 
 def delete_path(path: str):

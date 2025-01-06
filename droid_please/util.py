@@ -25,11 +25,7 @@ def callable_params_as_json_schema(func: Callable) -> SchemaWrapper:
     type_hints = get_type_hints(func)
     sig = signature(func)
 
-    adapters = {
-        param: TypeAdapter(typ)
-        for param, typ in type_hints.items()
-        if param != "return"
-    }
+    adapters = {param: TypeAdapter(typ) for param, typ in type_hints.items() if param != "return"}
 
     properties = {p: a.json_schema() for p, a in adapters.items()}
 
@@ -39,9 +35,7 @@ def callable_params_as_json_schema(func: Callable) -> SchemaWrapper:
             defs.update(schema["$defs"])
 
     required = [
-        param_name
-        for param_name, param in sig.parameters.items()
-        if param.default == param.empty
+        param_name for param_name, param in sig.parameters.items() if param.default == param.empty
     ]
 
     schema = dict(type="object")
