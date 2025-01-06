@@ -22,7 +22,6 @@ jobs:
           python-version: '3.11'
           cache: 'poetry'
       - run: poetry version patch
-      - run: poetry lock --no-update
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "bumping versions"
