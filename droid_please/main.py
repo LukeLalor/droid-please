@@ -125,17 +125,17 @@ def learn():
     
     BE CONCISE: While thorough, keep the summary clear and well-organized. Respond directly with the summary.
     """
-    execute(agent, learn_prompt, save=False)
+    execute(agent, learn_prompt, save=False, tool_override=[ls, read_file])
 
     with agent_console.status("summarizing..."):
         chunks = []
-        for chunk in agent.stream(messages=[MessageParam(content=summarize_prompt, role="user")]):
+        for chunk in agent.stream(messages=[MessageParam(content=summarize_prompt, role="user")], tools=[ls, read_file]):
             if isinstance(chunk, ResponseChunk):
                 chunks.append(chunk.content)
                 agent_console.print(chunk.content, end="")
         agent_console.print()
 
-    final_summary = "\n".join(chunks)
+    final_summary = "".join(chunks)
     with open(Path(config().project_root).joinpath(".droid/summary.txt"), "w") as f:
         f.write(final_summary)
     console.print("Done.")
@@ -215,7 +215,7 @@ def _run_hooks(hooks: list[str]):
             raise SystemExit(1)
 
 
-def execute(agent: Agent, command: str, save: bool = False):
+def execute(agent: Agent, command: str, save: bool = False, tool_override: List[callable] = None):
     _run_hooks(config().pre_execution_hooks)
     status = console.status("thinking...")
     status.start()
@@ -224,7 +224,7 @@ def execute(agent: Agent, command: str, save: bool = False):
     try:
         for chunk in agent.stream(
             messages=[MessageParam(content=command, role="user")],
-            tools=[read_file, create_file, update_file, rename_file, delete_path, ls],
+            tools=tool_override or [read_file, create_file, update_file, rename_file, delete_path, ls],
         ):
             if isinstance(chunk, ResponseChunk):
                 if status:
