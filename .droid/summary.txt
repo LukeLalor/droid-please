@@ -1,0 +1,63 @@
+# Droid Please - AI-Powered Project Management CLI
+
+## Project Overview
+A CLI tool that serves as an AI coding assistant, leveraging Anthropic's Claude to enable natural language interactions for project management and file operations. Users can issue commands in plain English to manipulate files and manage their codebase.
+
+## Technical Stack
+- Python 3.10+
+- Key Dependencies:
+  - `anthropic`: Claude AI integration
+  - `typer`: CLI framework
+  - `rich`: Terminal formatting
+  - `pydantic`: Data validation
+  - `poetry`: Dependency management
+
+## Core Components
+1. **CLI Interface** (`main.py`)
+   - Entry point for the application
+   - Handles command routing and user interaction
+   - Implements interactive and direct command modes
+
+2. **Agent System** (`agent.py`)
+   - Manages communication with Claude AI
+   - Handles message streaming and tool execution
+   - Maintains conversation context
+
+3. **File Operations** (`agent_tools.py`)
+   - Core file manipulation functions:
+     - read_file: File content reading
+     - create_file: File creation
+     - update_file: Content modification
+     - rename_file: File renaming
+     - delete_path: File/directory deletion
+     - ls: Directory listing
+
+## Project Structure
+```
+droid_please/
+├── main.py         # Application entry point
+├── agent.py        # AI agent implementation
+├── agent_tools.py  # File operation tools
+├── config.py       # Configuration management
+├── llm.py         # Language model interface
+└── util.py        # Utility functions
+
+tests/              # Test suite
+└── test_tools.py   # Tool testing
+```
+
+## Key Features
+- Natural language command processing
+- Project-aware file operations
+- Interactive CLI mode
+- Context-aware responses
+- Safe file manipulation within project boundaries
+- Configuration management via `.droid` directory
+
+## Security Features
+- Project root validation
+- Path traversal protection
+- API key management
+- Controlled file access boundaries
+
+The project efficiently combines AI capabilities with practical file system operations, providing a user-friendly interface for common development tasks through natural language commands.

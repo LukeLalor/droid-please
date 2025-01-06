@@ -20,6 +20,7 @@ from droid_please.agent_tools import (
 from droid_please.config import load_config, config, Config
 from droid_please.llm import ResponseChunk, ToolCallChunk, ToolResponse
 from rich.console import Console
+from rich.live import Live
 from rich.style import Style
 
 assert readline  # importing this allows better cli experience, assertion to prevent optimize imports from removing it
@@ -127,18 +128,18 @@ def learn():
     """
     execute(agent, learn_prompt, save=False, tool_override=[ls, read_file])
 
-    with agent_console.status("summarizing..."):
-        chunks = []
-        for chunk in agent.stream(messages=[MessageParam(content=summarize_prompt, role="user")], tools=[ls, read_file]):
-            if isinstance(chunk, ResponseChunk):
-                chunks.append(chunk.content)
-                agent_console.print(chunk.content, end="")
-        agent_console.print()
+    dim_console.print("Summarizing project structure and purpose...")
+    chunks = []
+    for chunk in agent.stream(messages=[MessageParam(content=summarize_prompt, role="user")], tools=[ls, read_file]):
+        if isinstance(chunk, ResponseChunk):
+            chunks.append(chunk.content)
+            agent_console.print(chunk.content, end="")
+    agent_console.print()
 
     final_summary = "".join(chunks)
     with open(Path(config().project_root).joinpath(".droid/summary.txt"), "w") as f:
         f.write(final_summary)
-    console.print("Done.")
+    dim_console.print("Done.")
 
 
 def please(
