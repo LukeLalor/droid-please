@@ -89,6 +89,8 @@ def update_file(file_path: str, insertions: List[InsertLines] = None, deletions:
     """
     insertions = insertions or []
     deletions = deletions or []
+    if not insertions and not deletions:
+        raise ValueError("No updates provided")
     _check_file_path(file_path)
     loc = Path(config().project_root).joinpath(file_path)
     with open(loc, "r") as f:
@@ -111,14 +113,16 @@ def update_file(file_path: str, insertions: List[InsertLines] = None, deletions:
             acc.append(lines[i])
     with open(loc, "w") as f:
         f.write("\n".join(acc))
-    min_line_effected = min(insertion_lines.keys())
+    potential_min_lines = []
+    potential_max_lines = []
+    if insertion_lines:
+        potential_min_lines.append(min(insertion_lines.keys()))
+        potential_max_lines.append(max((1 + i + len(lines) for i in insertion_lines.keys())))
     if deletions:
-        min_line_effected = min(min_line_effected, min(deletions, key=lambda d: d.start_line).start_line)
-    max_line_effected = max((i.insertion_index + len(i.lines) for i in insertions))
-    if deletions:
-        max_line_effected = max(max_line_effected, max(deletions, key=lambda d: d.end_line).end_line)
-    offset = max(min_line_effected-5, 0)
-    limit = min((max_line_effected + 5) - min_line_effected, len(lines)-offset)
+        potential_min_lines.append(min(deletions, key=lambda d: d.start_line).start_line)
+        potential_max_lines.append(max(deletions, key=lambda d: d.end_line).end_line)
+    offset = max(min(potential_min_lines)-5, 0)
+    limit = min((max(potential_max_lines) + 5), len(lines)) - offset
     return "Here is the updated portion of the file. If this does not look right please update it again.\n" + _read_file(loc, offset, limit)
 
 

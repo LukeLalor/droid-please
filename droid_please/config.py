@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from typing import Optional
 
 import yaml
 from dotenv import load_dotenv
@@ -10,6 +11,7 @@ from droid_please.llm import AnthropicLLM
 
 class Config(BaseModel):
     model: str = "claude-3-5-sonnet-latest"
+    project_summary: str | None = None
     max_tokens: int = 8192
     pre_execution_hooks: list[str] = []
     post_execution_hooks: list[str] = []
@@ -32,7 +34,7 @@ class Config(BaseModel):
             yaml.dump(self.model_dump(exclude={"project_root"}), f, sort_keys=False)
 
 
-_config: Config = None
+_config: Optional[Config] = None
 
 
 def config() -> Config:

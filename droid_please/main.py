@@ -91,6 +91,56 @@ def _llm():
 
 
 @app.command()
+def learn():
+    """
+    Analyze the project structure and learn about its organization and purpose.
+    The summary will be saved to the config file for future reference.
+    """
+    _load_config()
+    agent = Agent(llm=_llm())
+    learn_prompt = """
+    You are being asked to analyze and understand this project's structure and purpose. 
+    Your task is to:
+    1. EXPLORE: Systematically examine the project files and directories
+    2. ANALYZE: Understand the project's:
+       - Core purpose and functionality
+       - Technical stack and dependencies
+       - Key components and their relationships
+       - Project organization and architecture
+    3. SUMMARIZE: Create a comprehensive yet concise summary that a new developer would find helpful
+
+    IMPORTANT DIRECTIVES:
+    - BE THOROUGH: Use the ls and read_file tools to examine ALL relevant files
+    - BE SYSTEMATIC: Start with high-level files then dive into source code
+    - FOCUS ON STRUCTURE: Pay special attention to how the project is organized
+    - BE SPECIFIC: Include actual file paths and component names
+    - BE CONCISE: While thorough, keep the final summary clear and well-organized
+
+    When you are done with your EXPLORATION and ANALYSIS, respond with "I'm ready to summarize".
+    START YOUR EXPLORATION NOW.
+    """
+
+    summarize_prompt = """
+    Thank you. Please summarize the project structure and purpose.
+    
+    BE CONCISE: While thorough, keep the summary clear and well-organized. Respond directly with the summary.
+    """
+    execute(agent, learn_prompt, save=False)
+
+    with agent_console.status("summarizing..."):
+        chunks = []
+        for chunk in agent.stream(messages=[MessageParam(content=summarize_prompt, role="user")]):
+            if isinstance(chunk, ResponseChunk):
+                chunks.append(chunk.content)
+                agent_console.print(chunk.content, end="")
+        agent_console.print()
+
+    final_summary = "\n".join(chunks)
+    with open(Path(config().project_root).joinpath(".droid/summary.txt"), "w") as f:
+        f.write(final_summary)
+    console.print("Done.")
+
+
 def please(
     prompt: Annotated[List[str], typer.Argument()] = None,
     interactive: Annotated[bool, typer.Option("--interactive", "-i")] = False,
@@ -123,17 +173,32 @@ def continue_(
     execution_loop(agent, interactive, " ".join(prompt) if prompt else None, save)
 
 
+def _prompt():
+    return typer.prompt(text=">", prompt_suffix="")
+
+
 def execution_loop(agent, interactive, prompt, save: bool = False):
+    magic_words = set("droid save")
     if not prompt:
         if not interactive:
             err_console.print("Error: prompt is required in non-interactive mode")
             raise SystemExit(1)
         else:
-            prompt = typer.prompt(text=">", prompt_suffix="")
-    execute(agent, prompt, save)
-    while interactive:
-        prompt = typer.prompt(text=">", prompt_suffix="")
+            prompt = _prompt()
+    if not interactive:
         execute(agent, prompt, save)
+    else:
+        while interactive:
+            prompt = _prompt()
+            while prompt in magic_words:
+                if prompt == "droid save":
+                    save = True
+                    agent.save(Path(config().project_root).joinpath(".droid"))
+                    dim_console.print("Conversation saved.")
+                else:
+                    err_console.print("Unknown Command")
+                prompt = _prompt()
+            execute(agent, prompt, save)
 
 
 def _run_hooks(hooks: list[str]):
