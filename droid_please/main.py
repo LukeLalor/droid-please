@@ -144,7 +144,7 @@ def continue_(
 ):
     """
     Continue a conversation with the droid.
-    If no conversation ID is provided, continues the most recent conversation.
+    If no conversation file is provided, continues the most recent conversation.
     """
     _load_config()
     agent = Agent.load(loc=conversation, llm=_llm())
