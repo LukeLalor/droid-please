@@ -97,3 +97,13 @@ driod please "Update (or create) my project's readme" -i
 * `droid please`
 * `droid continue`
 
+
+## Contributing
+
+Droid Please!
+
+### Need Help?
+
+- Open an issue for questions or problems
+
+Thank you for taking a look at Droid Please! 🚀
