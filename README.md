@@ -28,13 +28,13 @@ When using `droid please` the agent has access to the project summary and tools 
 ## Pre-requisites
 ### Robust Version Control
 Before we get into this project at all, you should have a robust version control system in place. This project is about 
-letting AI Agents manage your projects, which means they will end up breaking things. You should use this tool carefully
-and always have a way to roll back `droid` changes.
+letting AI Agents manage your projects, which means droid can modify files within your project. Eventually **🚨 Droid 
+will break something 🚨**, and when this happens the ability to revert those changes is paramount.
 
 ### Python 3.10
 This project requires Python 3.10 or higher. You can download the latest version of Python from the [official website](https://www.python.org/downloads/).
 
-### Pip
+### PIP
 The Quickstart guide uses pip. You can install pip by following the instructions [here](https://pip.pypa.io/en/stable/installation/).
 
 ### Anthropic API Key
@@ -90,12 +90,6 @@ droid learn
 driod please "Update (or create) my project's readme" -i
 ```
 > The `-i` flag is for interactive mode. This will allow you to continue a conversation with your agent without having to run additional commands.
-
-## CLI Overview
-* `droid init`
-* `droid learn`
-* `droid please`
-* `droid continue`
 
 
 ## Contributing
