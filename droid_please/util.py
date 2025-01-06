@@ -1,3 +1,4 @@
+import copy
 from inspect import signature
 from typing import Callable, get_type_hints, Dict
 
@@ -33,7 +34,7 @@ def callable_params_as_json_schema(func: Callable) -> SchemaWrapper:
     defs = {}
     for schema in properties.values():
         if "$defs" in schema:
-            defs.update(schema["$defs"])
+            defs.update(schema.pop("$defs"))
 
     required = [
         param_name for param_name, param in sig.parameters.items() if param.default == param.empty
@@ -48,5 +49,8 @@ def callable_params_as_json_schema(func: Callable) -> SchemaWrapper:
         schema["required"] = required
 
     # LLMs have trouble following refs, so we inline them
-    inlined_def_schema = dict(jsonref.JsonRef.replace_refs(schema))
-    return SchemaWrapper(inlined_def_schema, adapters)
+    if "$defs" in schema:
+        # json serialization issues unless we deepcopy this
+        schema = copy.deepcopy(jsonref.replace_refs(schema, jsonschema=True))
+        del schema["$defs"]
+    return SchemaWrapper(schema, adapters)

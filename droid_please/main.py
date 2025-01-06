@@ -69,6 +69,7 @@ def init(loc: Annotated[Path, typer.Argument()] = Path.cwd()):
         if api_key:
             with open(droid_dir.joinpath(".env"), "w") as f:
                 f.write(f"ANTHROPIC_API_KEY={api_key}")
+    dim_console.print("Initialized project:", droid_dir)
 
 
 def _load_config():
@@ -88,9 +89,7 @@ def _llm():
 
 
 @app.command()
-def learn(
-    save: Annotated[bool, typer.Option("--save", "-s", help="Save conversation state")] = False,
-):
+def learn():
     """
     Analyze the project structure and learn about its organization and purpose.
     The summary will be saved to the config file for future reference.
@@ -100,7 +99,7 @@ def learn(
         llm=_llm(),
         boot_messages=[MessageParam(content=config().get_system_prompt(), role="system")],
     )
-    execute(agent, config().learn_prompt, save=save, tool_override=[ls, read_file])
+    execute(agent, config().learn_prompt, tool_override=[ls, read_file])
 
     dim_console.print("Summarizing project structure and purpose...")
     chunks = []
@@ -114,16 +113,16 @@ def learn(
     agent_console.print()
 
     final_summary = "".join(chunks)
-    with open(Path(config().project_root).joinpath(".droid/summary.txt"), "w") as f:
+    summary_loc = Path(config().project_root).joinpath(".droid/summary.txt")
+    with open(summary_loc, "w") as f:
         f.write(final_summary)
-    dim_console.print("Done.")
+    dim_console.print("Saved summary to", summary_loc.relative_to(Path.cwd()))
 
 
 @app.command()
 def please(
     prompt: Annotated[List[str], typer.Argument()] = None,
     interactive: Annotated[bool, typer.Option("--interactive", "-i")] = False,
-    save: Annotated[bool, typer.Option("--save", "-s", help="Save conversation state")] = False,
 ):
     """
     Ask the droid to do something.
@@ -133,46 +132,40 @@ def please(
         llm=_llm(),
         boot_messages=[MessageParam(content=config().get_system_prompt(), role="system")],
     )
-    execution_loop(agent, interactive, " ".join(prompt) if prompt else None, save)
+    execution_loop(agent, interactive, " ".join(prompt) if prompt else None)
 
 
 @app.command(name="continue")
 def continue_(
     prompt: Annotated[List[str], typer.Argument()] = None,
     interactive: Annotated[bool, typer.Option("--interactive", "-i")] = False,
-    conversation: Annotated[Optional[Path], typer.Option("--conversation", "-c")] = None,
-    save: Annotated[bool, typer.Option("--save", "-s", help="Save conversation state")] = False,
+    file: Annotated[Optional[Path], typer.Option("--file", "-f")] = None,
 ):
     """
     Continue a conversation with the droid.
     If no conversation file is provided, continues the most recent conversation.
     """
     _load_config()
-    conversation = conversation or Path(config().project_root).joinpath(
-        ".droid/conversations/latest.yaml"
-    )
+    file = file or Path(config().project_root).joinpath(".droid/conversations/latest.yaml")
     try:
-        agent = Agent.load(loc=conversation, llm=_llm())
+        agent = Agent.load(loc=file, llm=_llm())
     except FileNotFoundError:
-        err_console.print(f"Conversation file not found: {conversation}")
+        err_console.print(f"Conversation file not found: {file}")
         raise SystemExit(1)
-    execution_loop(agent, interactive, " ".join(prompt) if prompt else None, save)
+    execution_loop(agent, interactive, " ".join(prompt) if prompt else None)
 
 
 def _prompt():
     return typer.prompt(text=">", prompt_suffix="")
 
 
-def execution_loop(agent, interactive, prompt, save: bool = False):
-    if not interactive:
-        if not prompt:
-            err_console.print("Error: prompt is required in non-interactive mode")
-            raise SystemExit(1)
-        execute(agent, prompt, save)
+def execution_loop(agent, interactive, prompt):
+    if not prompt and interactive:
+        execute(agent, prompt)
     else:
-        while interactive:
+        while True:
             prompt = prompt or _prompt()
-            execute(agent, prompt, save)
+            execute(agent, prompt)
             prompt = None
 
 
@@ -190,13 +183,12 @@ def _run_hooks(hooks: list[str]):
             raise SystemExit(1)
 
 
-def execute(agent: Agent, command: str, save: bool = False, tool_override: List[callable] = None):
+def execute(agent: Agent, command: str, tool_override: List[callable] = None):
     _run_hooks(config().pre_execution_hooks)
     status = console.status("thinking...")
     status.start()
     last_chunk = None
     t0 = time.perf_counter()
-    save_loc = None
     try:
         for chunk in agent.stream(
             messages=[MessageParam(content=command, role="user")],
@@ -235,30 +227,28 @@ def execute(agent: Agent, command: str, save: bool = False, tool_override: List[
         raise SystemExit(1)
     finally:
         agent.save(latest_loc_path())
-        if save:
-            save_loc = save_loc or next_conversation_number()
-            agent.save(save_loc)
         _run_hooks(config().post_execution_hooks)
 
 
 @app.command()
 def save(
-    conversation: Annotated[Optional[Path], typer.Option("--conversation", "-c")] = None,
+    file: Annotated[Optional[Path], typer.Option("--file", "-f")] = None,
 ):
     """
     Save a version of the latest conversation. If no conversation file is provided, saves the most recent conversation.
     """
     _load_config()
-    conversation = Path(conversation or latest_loc_path())
     try:
-        agent = Agent.load(loc=conversation, llm=None)
+        agent = Agent.load(loc=latest_loc_path(), llm=None)
     except FileNotFoundError:
-        err_console.print(f"Conversation file not found: {conversation}")
+        err_console.print("Conversation not found")
         raise SystemExit(1)
-    save_loc = next_conversation_number()
+    save_loc = file or next_conversation_number()
     agent.save(save_loc)
-    agent.save(latest_loc_path())
-    agent_console.print("Saved conversation to", save_loc.relative_to(Path.cwd()))
+    print_loc = (
+        save_loc.relative_to(Path.cwd()) if save_loc.is_relative_to(Path.cwd()) else save_loc
+    )
+    dim_console.print("Saved conversation to", print_loc)
 
 
 if __name__ == "__main__":
