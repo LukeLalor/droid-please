@@ -7,15 +7,17 @@ from click.testing import Result
 from dotenv import load_dotenv
 from typer.testing import CliRunner
 from droid_please.main import app
+from vcr import VCR
 
 load_dotenv()
 runner = CliRunner()
 
 
 @pytest.fixture(scope='module')
-def vcr(vcr):
+def vcr(vcr: VCR):
     vcr.match_on = ['method', 'host', 'port', 'path', 'query', 'body']
     vcr.filter_headers = ['x-api-key']
+    vcr.record_mode = 'once'
     return vcr
 
 
