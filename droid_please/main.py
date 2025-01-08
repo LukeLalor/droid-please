@@ -19,7 +19,7 @@ from droid_please.agent_tools import (
 )
 from droid_please.config import load_config, config, Config
 from droid_please.conversations import latest_loc_path, next_conversation_number
-from droid_please.llm import ResponseChunk, ToolCallChunk, ToolResponse
+from droid_please.llm import ResponseChunk, ToolCallChunk, ToolResponse, UsageSummary
 from rich.console import Console
 from rich.style import Style
 from rich.text import Text
@@ -170,7 +170,7 @@ def _prompt():
 
 
 def execution_loop(agent, interactive, prompt):
-    if not prompt and interactive:
+    if prompt and not interactive:
         execute(agent, prompt)
     else:
         while True:
@@ -228,8 +228,9 @@ def execute(agent: Agent, command: str, tool_override: List[callable] = None):
             elif isinstance(chunk, ToolResponse):
                 if chunk.is_error:
                     err_console.print(chunk.response)
+            elif isinstance(chunk, UsageSummary):
+                dim_console.print(f"\ntokens: input {chunk.input:,} generated {chunk.generated:,}")
             last_chunk = chunk
-        console.print()
     except AuthenticationError as e:
         if status:
             status.stop()

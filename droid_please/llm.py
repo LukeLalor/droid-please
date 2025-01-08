@@ -8,6 +8,7 @@ from anthropic.types import (
     RawContentBlockStartEvent,
     TextBlock,
     ToolUseBlock,
+    MessageStopEvent
 )
 from pydantic import BaseModel
 
@@ -28,6 +29,11 @@ class ToolResponse(BaseModel):
     id: str
     response: Any
     is_error: bool
+
+
+class UsageSummary(BaseModel):
+    input: int
+    generated: int
 
 
 class LLM(ABC):
@@ -61,10 +67,7 @@ class AnthropicLLM(LLM):
     def stream(
         self, messages: List[MessageParam], tools: List[ToolParam]
     ) -> Generator[ToolCallChunk | ResponseChunk, None, None]:
-        kwargs = {}
-        if messages and messages[0].get("role") == "system":
-            kwargs["system"] = messages[0]["content"]
-            messages = messages[1:]
+        kwargs, messages = self._messages(messages)
         with self.client.messages.stream(
             messages=messages,
             tools=tools,
@@ -73,16 +76,26 @@ class AnthropicLLM(LLM):
             **kwargs,
         ) as chunk_stream:
             block: Optional[RawContentBlockStartEvent] = None
+            chunks = []
             for chunk in chunk_stream:
+                chunks.append(chunk)
                 if isinstance(chunk, RawContentBlockStartEvent):
                     block = chunk
-                elif block and isinstance(block.content_block, TextBlock):
-                    if isinstance(chunk, TextEvent):
-                        yield ResponseChunk(content=chunk.text)
-                elif block and isinstance(block.content_block, ToolUseBlock):
-                    if isinstance(chunk, InputJsonEvent):
-                        yield ToolCallChunk(
-                            id=block.content_block.id,
-                            tool=block.content_block.name,
-                            content=chunk.partial_json,
-                        )
+                elif block and isinstance(block.content_block, TextBlock) and isinstance(chunk, TextEvent):
+                    yield ResponseChunk(content=chunk.text)
+                elif block and isinstance(block.content_block, ToolUseBlock) and isinstance(chunk, InputJsonEvent):
+                    yield ToolCallChunk(
+                        id=block.content_block.id,
+                        tool=block.content_block.name,
+                        content=chunk.partial_json,
+                    )
+                elif isinstance(chunk, MessageStopEvent):
+                    yield UsageSummary(input=chunk.message.usage.input_tokens, generated=chunk.message.usage.output_tokens)
+
+    @staticmethod
+    def _messages(messages):
+        kwargs = {}
+        if messages and messages[0].get("role") == "system":
+            kwargs["system"] = messages[0]["content"]
+            messages = messages[1:]
+        return kwargs, messages

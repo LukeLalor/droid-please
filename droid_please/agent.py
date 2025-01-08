@@ -14,7 +14,7 @@ from anthropic.types import (
     ToolUseBlockParam,
     TextBlockParam,
 )
-from droid_please.llm import LLM, ToolCallChunk, ResponseChunk, ToolResponse
+from droid_please.llm import LLM, ToolCallChunk, ResponseChunk, ToolResponse, UsageSummary
 from droid_please.util import callable_params_as_json_schema, SchemaWrapper
 
 
@@ -30,7 +30,7 @@ class Agent:
         messages: List[MessageParam],
         tools: List[Callable] = None,
         boot_override: List[MessageParam] = None,
-    ) -> Generator[ResponseChunk | ToolCallChunk | ToolResponse, None, None]:
+    ) -> Generator[ResponseChunk | ToolCallChunk | ToolResponse | UsageSummary, None, None]:
         self.messages.extend(messages)
         boot_messages = self.boot_messages if boot_override is None else boot_override
         tools: Dict[str, ToolWrapper] = {
@@ -55,8 +55,6 @@ class Agent:
                     if not agent_response or not isinstance(agent_response[-1][-1], ResponseChunk):
                         agent_response.append([])
                     agent_response[-1].append(chunk)
-                else:
-                    raise NotImplementedError("unknown chunk type")
                 yield chunk
             if len(agent_response) == 1 and isinstance(agent_response[0][0], ResponseChunk):
                 join = "".join([r.content for r in agent_response[0]])
@@ -154,6 +152,10 @@ class Agent:
         agent = Agent(llm=llm, boot_messages=data["boot_messages"])
         agent.messages = data["messages"]
         return agent
+
+    def conversation_length(self, tool_override: List[callable] = None):
+        tools = [tw.tool for tw in (ToolWrapper(t) for t in tool_override or [])] if tool_override else self._last_used_tools
+        return self._llm.count_tokens(messages=self.messages, tools=tools)
 
 
 class ToolWrapper:
