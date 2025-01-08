@@ -195,50 +195,46 @@ def _run_hooks(hooks: list[str]):
 
 def execute(agent: Agent, command: str, tool_override: List[callable] = None):
     _run_hooks(config().pre_execution_hooks)
-    status = console.status("thinking...")
-    status.start()
-    last_chunk = None
-    t0 = time.perf_counter()
-    try:
-        for chunk in agent.stream(
-            messages=[MessageParam(content=command, role="user")],
-            tools=tool_override
-            or [read_file, create_file, update_file, rename_file, delete_path, ls],
-        ):
-            if isinstance(chunk, ResponseChunk):
-                if status:
+    with console.status("thinking...") as status:
+        last_chunk = None
+        t0 = time.perf_counter()
+        try:
+            for chunk in agent.stream(
+                messages=[MessageParam(content=command, role="user")],
+                tools=tool_override
+                or [read_file, create_file, update_file, rename_file, delete_path, ls],
+            ):
+                if isinstance(chunk, ResponseChunk):
                     status.stop()
-                    status = None
-                if not last_chunk or isinstance(last_chunk, ResponseChunk):
-                    agent_console.print(chunk.content, end="")
-                else:
-                    agent_console.print("\n", chunk.content.lstrip(), sep="", end="")
-            elif isinstance(chunk, ToolCallChunk):
-                t1 = time.perf_counter()
-                if (
-                    not last_chunk
-                    or not isinstance(last_chunk, ToolCallChunk)
-                    or chunk.id != last_chunk.id
-                ):
-                    dim_console.print("\n", "calling tool ", chunk.tool, sep="", end="")
-                    t0 = t1
-                elif chunk.content and (t1 - t0) > 0.2:
-                    dim_console.print(".", end="")
-                    t0 = t1
-            elif isinstance(chunk, ToolResponse):
-                if chunk.is_error:
-                    err_console.print(chunk.response)
-            elif isinstance(chunk, UsageSummary):
-                dim_console.print(f"\ntokens: input {chunk.input:,} generated {chunk.generated:,}")
-            last_chunk = chunk
-    except AuthenticationError as e:
-        if status:
+                    if not last_chunk or isinstance(last_chunk, ResponseChunk):
+                        agent_console.print(chunk.content, end="")
+                    else:
+                        agent_console.print("\n", chunk.content.lstrip(), sep="", end="")
+                elif isinstance(chunk, ToolCallChunk):
+                    t1 = time.perf_counter()
+                    if (
+                        not last_chunk
+                        or not isinstance(last_chunk, ToolCallChunk)
+                        or chunk.id != last_chunk.id
+                    ):
+                        dim_console.print("\n", "calling tool ", chunk.tool, sep="", end="")
+                        t0 = t1
+                    elif chunk.content and (t1 - t0) > 0.2:
+                        dim_console.print(".", end="")
+                        t0 = t1
+                elif isinstance(chunk, ToolResponse):
+                    if chunk.is_error:
+                        err_console.print(chunk.response)
+                elif isinstance(chunk, UsageSummary):
+                    dim_console.print(f"\ntokens: input {chunk.input:,} generated {chunk.generated:,}")
+                last_chunk = chunk
+        except AuthenticationError as e:
             status.stop()
-        err_console.print("Received Authentication error from Anthropic:", e)
-        raise SystemExit(1)
-    finally:
-        agent.save(latest_loc_path())
-        _run_hooks(config().post_execution_hooks)
+            err_console.print("Received Authentication error from Anthropic:", e)
+            raise SystemExit(1)
+        finally:
+            agent.save(latest_loc_path())
+            _run_hooks(config().post_execution_hooks)
 
 
 @app.command()
@@ -285,7 +281,6 @@ def _summarize(loc):
                 MessageParam(content=config().get_system_prompt(pcs="".join(chunks)), role="system")
             ],
         )
-        status.stop()
     return agent
 
 
