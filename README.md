@@ -12,7 +12,7 @@ droid --help
     │ learn      Analyze the project structure and learn about its organization and purpose. The summary will be saved to the config file for future reference.│
     │ please     Ask the droid to do something.                                                                                                                │
     │ continue   Continue a conversation with the droid. If no conversation file is provided, continues the most recent conversation.                          │
-    │ save       Save a version of the latest conversation. If no conversation file is provided, saves the most recent conversation.                           │
+    │ summarize  Create a new conversation by summarizing an existing conversation.                                                                            |
     ╰──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 droid please "write tests for ..."
 ```
