@@ -110,7 +110,7 @@ def learn():
     dim_console.print("Summarizing project structure and purpose...")
     chunks = []
     for chunk in agent.stream(
-        messages=[MessageParam(content=config().summarize_prompt, role="user")],
+        messages=[MessageParam(content=config().learn_summarize_prompt, role="user")],
         tools=[ls, read_file],
     ):
         if isinstance(chunk, ResponseChunk):
@@ -146,6 +146,7 @@ def continue_(
     prompt: Annotated[List[str], typer.Argument()] = None,
     interactive: Annotated[bool, typer.Option("--interactive", "-i")] = False,
     file: Annotated[Optional[Path], typer.Option("--file", "-f")] = None,
+    summarize: Annotated[bool, typer.Option("--summarize", "-s")] = False,
 ):
     """
     Continue a conversation with the droid.
@@ -153,11 +154,14 @@ def continue_(
     """
     _load_config()
     file = file or Path(config().project_root).joinpath(".droid/conversations/latest.yaml")
-    try:
-        agent = Agent.load(loc=file, llm=_llm())
-    except FileNotFoundError:
-        err_console.print(f"Conversation file not found: {file}")
-        raise SystemExit(1)
+    if summarize:
+        agent = _summarize(file)
+    else:
+        try:
+            agent = Agent.load(loc=file, llm=_llm())
+        except FileNotFoundError:
+            err_console.print(f"Conversation file not found: {file}")
+            raise SystemExit(1)
     execution_loop(agent, interactive, " ".join(prompt) if prompt else None)
 
 
@@ -234,6 +238,41 @@ def execute(agent: Agent, command: str, tool_override: List[callable] = None):
     finally:
         agent.save(latest_loc_path())
         _run_hooks(config().post_execution_hooks)
+
+
+@app.command()
+def summarize(
+        file: Annotated[Optional[Path], typer.Option("--file", "-f")] = None,
+):
+    """
+    Create a new summary from an existing conversation.
+    """
+    _load_config()
+    loc = file or latest_loc_path()
+    _summarize(loc).save(latest_loc_path())
+    agent_console.print(
+        "\nDone. Run droid",
+        Text("droid continue", style="bold magenta"),
+        "to continue the conversation.",
+    )
+
+
+def _summarize(loc):
+    try:
+        agent = Agent.load(loc=loc, llm=_llm())
+    except FileNotFoundError:
+        err_console.print("No conversation found. Run", Text("droid please", style="bold magenta"),
+                          "to start a new conversation.")
+        raise SystemExit(1)
+    chunks = []
+    for chunk in agent.stream(messages=[MessageParam(content=config().conversation_summarize_prompt, role="user")],
+                              tools=[ls, read_file]):
+        if isinstance(chunk, ResponseChunk):
+            chunks.append(chunk.content)
+            dim_console.print(chunk.content, end="")
+    agent = Agent(llm=_llm(),
+                  boot_messages=[MessageParam(content=config().get_system_prompt(pcs="".join(chunks)), role="system")])
+    return agent
 
 
 @app.command()

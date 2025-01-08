@@ -5,9 +5,10 @@ from typing import Optional
 import yaml
 from dotenv import load_dotenv
 from droid_please.prompts import (
-    default_system_prompt,
-    default_learn_prompt,
-    default_summarize_prompt,
+    system_prompt,
+    learn_prompt,
+    learn_summarize_prompt,
+    conversation_summarize_prompt,
 )
 from pydantic import BaseModel
 
@@ -19,18 +20,20 @@ class Config(BaseModel):
     max_tokens: int = 8192
     pre_execution_hooks: list[str] = []
     post_execution_hooks: list[str] = []
-    system_prompt: str = default_system_prompt
-    learn_prompt: str = default_learn_prompt
-    summarize_prompt: str = default_summarize_prompt
+    system_prompt: str = system_prompt
+    learn_prompt: str = learn_prompt
+    learn_summarize_prompt: str = learn_summarize_prompt
+    conversation_summarize_prompt: str = conversation_summarize_prompt
     project_root: str
 
-    def get_system_prompt(self):
+    def get_system_prompt(self, pcs: str = "") -> str:
         summary_path = Path(self.project_root).joinpath(".droid").joinpath("summary.txt")
         try:
-            project_summary = summary_path.read_text()
+            project_summary = "CURRENT PROJECT CONTEXT\n" + summary_path.read_text() + "\nEND CURRENT PROJECT CONTEXT"
         except FileNotFoundError:
-            project_summary = "Project summary has not yet been generated."
-        return self.system_prompt.format(project_summary=project_summary)
+            project_summary = ""
+        pcs = "PREVIOUS CONVERSATION SUMMARY\n" + pcs + "\nEND PREVIOUS CONVERSATION SUMMARY" if pcs else ""
+        return self.system_prompt.format(project_summary=project_summary, previous_conversation_summary=pcs)
 
     def llm(self):
         api_key = os.getenv("ANTHROPIC_API_KEY")

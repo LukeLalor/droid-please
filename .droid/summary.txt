@@ -25,7 +25,7 @@ A command-line interface tool that enables natural language project management t
 ### 2. Project Organization
 ```
 droid_please/
-├── Core Source Files
+├── Core Source Files (droid_please/...)
 │   ├── main.py         # CLI interface
 │   ├── agent.py        # AI orchestration
 │   ├── agent_tools.py  # File operations
