@@ -154,7 +154,11 @@ class Agent:
         return agent
 
     def conversation_length(self, tool_override: List[callable] = None):
-        tools = [tw.tool for tw in (ToolWrapper(t) for t in tool_override or [])] if tool_override else self._last_used_tools
+        tools = (
+            [tw.tool for tw in (ToolWrapper(t) for t in tool_override or [])]
+            if tool_override
+            else self._last_used_tools
+        )
         return self._llm.count_tokens(messages=self.messages, tools=tools)
 
 

@@ -243,7 +243,7 @@ def execute(agent: Agent, command: str, tool_override: List[callable] = None):
 
 @app.command()
 def summarize(
-        file: Annotated[Optional[Path], typer.Option("--file", "-f")] = None,
+    file: Annotated[Optional[Path], typer.Option("--file", "-f")] = None,
 ):
     """
     Create a new summary from an existing conversation.
@@ -252,7 +252,7 @@ def summarize(
     loc = file or latest_loc_path()
     _summarize(loc).save(latest_loc_path())
     agent_console.print(
-        "\nDone. Run droid",
+        "Done. Run droid",
         Text("droid continue", style="bold magenta"),
         "to continue the conversation.",
     )
@@ -262,17 +262,30 @@ def _summarize(loc):
     try:
         agent = Agent.load(loc=loc, llm=_llm())
     except FileNotFoundError:
-        err_console.print("No conversation found. Run", Text("droid please", style="bold magenta"),
-                          "to start a new conversation.")
+        err_console.print(
+            "No conversation found. Run",
+            Text("droid please", style="bold magenta"),
+            "to start a new conversation.",
+        )
         raise SystemExit(1)
     chunks = []
-    for chunk in agent.stream(messages=[MessageParam(content=config().conversation_summarize_prompt, role="user")],
-                              tools=[ls, read_file]):
-        if isinstance(chunk, ResponseChunk):
-            chunks.append(chunk.content)
-            dim_console.print(chunk.content, end="")
-    agent = Agent(llm=_llm(),
-                  boot_messages=[MessageParam(content=config().get_system_prompt(pcs="".join(chunks)), role="system")])
+    status_portion = ""
+    with console.status("thinking...") as status:
+        for chunk in agent.stream(
+            messages=[MessageParam(content=config().conversation_summarize_prompt, role="user")],
+            tools=[ls, read_file],
+        ):
+            if isinstance(chunk, ResponseChunk):
+                status.update(f"summarizing...")
+                chunks.append(chunk.content)
+                status_portion = (status_portion + chunk.content)[-50:].split("\n")[-1]
+        agent = Agent(
+            llm=_llm(),
+            boot_messages=[
+                MessageParam(content=config().get_system_prompt(pcs="".join(chunks)), role="system")
+            ],
+        )
+        status.stop()
     return agent
 
 

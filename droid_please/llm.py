@@ -8,7 +8,7 @@ from anthropic.types import (
     RawContentBlockStartEvent,
     TextBlock,
     ToolUseBlock,
-    MessageStopEvent
+    MessageStopEvent,
 )
 from pydantic import BaseModel
 
@@ -81,16 +81,27 @@ class AnthropicLLM(LLM):
                 chunks.append(chunk)
                 if isinstance(chunk, RawContentBlockStartEvent):
                     block = chunk
-                elif block and isinstance(block.content_block, TextBlock) and isinstance(chunk, TextEvent):
+                elif (
+                    block
+                    and isinstance(block.content_block, TextBlock)
+                    and isinstance(chunk, TextEvent)
+                ):
                     yield ResponseChunk(content=chunk.text)
-                elif block and isinstance(block.content_block, ToolUseBlock) and isinstance(chunk, InputJsonEvent):
+                elif (
+                    block
+                    and isinstance(block.content_block, ToolUseBlock)
+                    and isinstance(chunk, InputJsonEvent)
+                ):
                     yield ToolCallChunk(
                         id=block.content_block.id,
                         tool=block.content_block.name,
                         content=chunk.partial_json,
                     )
                 elif isinstance(chunk, MessageStopEvent):
-                    yield UsageSummary(input=chunk.message.usage.input_tokens, generated=chunk.message.usage.output_tokens)
+                    yield UsageSummary(
+                        input=chunk.message.usage.input_tokens,
+                        generated=chunk.message.usage.output_tokens,
+                    )
 
     @staticmethod
     def _messages(messages):

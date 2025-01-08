@@ -29,11 +29,21 @@ class Config(BaseModel):
     def get_system_prompt(self, pcs: str = "") -> str:
         summary_path = Path(self.project_root).joinpath(".droid").joinpath("summary.txt")
         try:
-            project_summary = "CURRENT PROJECT CONTEXT\n" + summary_path.read_text() + "\nEND CURRENT PROJECT CONTEXT"
+            project_summary = (
+                "CURRENT PROJECT CONTEXT\n"
+                + summary_path.read_text()
+                + "\nEND CURRENT PROJECT CONTEXT"
+            )
         except FileNotFoundError:
             project_summary = ""
-        pcs = "PREVIOUS CONVERSATION SUMMARY\n" + pcs + "\nEND PREVIOUS CONVERSATION SUMMARY" if pcs else ""
-        return self.system_prompt.format(project_summary=project_summary, previous_conversation_summary=pcs)
+        pcs = (
+            "PREVIOUS CONVERSATION SUMMARY\n" + pcs + "\nEND PREVIOUS CONVERSATION SUMMARY"
+            if pcs
+            else ""
+        )
+        return self.system_prompt.format(
+            project_summary=project_summary, previous_conversation_summary=pcs
+        )
 
     def llm(self):
         api_key = os.getenv("ANTHROPIC_API_KEY")
