@@ -28,3 +28,5 @@ jobs:
           cache: 'poetry'
       - run: poetry install
       - run: poetry run pytest
+        env:
+          ANTHROPIC_API_KEY: intentionally-unset

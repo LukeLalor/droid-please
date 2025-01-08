@@ -1,0 +1,457 @@
+interactions:
+- request:
+    body: "{\"max_tokens\":8192,\"messages\":[{\"content\":\"rename openings.md to
+      old_openings.md\",\"role\":\"user\"},{\"role\":\"assistant\",\"content\":[{\"type\":\"text\",\"text\":\"I'll
+      help you rename the file 'openings.md' to 'old_openings.md' in the basics directory.
+      Based on the project structure, I can see the file is located at 'basics/openings.md'.\"},{\"id\":\"toolu_018oszEv2R6LdQijTKURu3Rq\",\"input\":{\"old_path\":\"basics/openings.md\",\"new_path\":\"basics/old_openings.md\"},\"name\":\"rename_file\",\"type\":\"tool_use\"}]},{\"role\":\"user\",\"content\":[{\"tool_use_id\":\"toolu_018oszEv2R6LdQijTKURu3Rq\",\"type\":\"tool_result\",\"content\":\"Renamed
+      basics/openings.md to basics/old_openings.md\",\"is_error\":false}]},{\"content\":\"\\n\\nThe
+      file has been successfully renamed from 'openings.md' to 'old_openings.md' while
+      maintaining its location in the basics directory. Is there anything else you'd
+      like me to help you with?\",\"role\":\"assistant\"},{\"content\":\"delete old_openings.md\",\"role\":\"user\"}],\"model\":\"claude-3-5-sonnet-latest\",\"system\":\"You
+      are an expert coding assistant with extensive software development experience.
+      Your role is to help developers manage their projects through natural language
+      commands.\\n\\nYour capabilities include:\\n1. Reading, creating, updating,
+      and deleting files\\n2. Listing directory contents\\n3. Providing detailed explanations
+      of code and project structure\\n4. Following best practices for code maintenance
+      and project organization\\n\\nGuidelines:\\n- Always maintain data integrity
+      and avoid destructive operations without confirmation\\n- When modifying files,
+      be precise and targeted in your changes\\n- Provide clear explanations for your
+      actions and recommendations\\n- If a request is ambiguous, ask for clarification
+      before proceeding\\n- Use your file operation tools carefully and verify paths
+      before modifications\\n\\nCURRENT PROJECT CONTEXT\\n# Chess Guide Project Summary\\n\\n##
+      Project Purpose\\nThis is an educational project designed to provide comprehensive
+      chess instruction, focusing on fundamentals, strategies, and advanced techniques.\\n\\n##
+      Project Structure\\n```\\n.\\n\u251C\u2500\u2500 README.md                 #
+      Project introduction and overview\\n\u251C\u2500\u2500 basics/                   #
+      Core chess concepts\\n\u2502   \u2514\u2500\u2500 openings.md          # Chess
+      opening moves and strategies\\n\u2514\u2500\u2500 .droid/                  #
+      Project configuration and conversation history\\n    \u251C\u2500\u2500 config.yaml
+      \         # AI assistant configuration\\n    \u251C\u2500\u2500 .gitignore\\n
+      \   \u2514\u2500\u2500 conversations/       # History of project interactions\\n
+      \       \u2514\u2500\u2500 latest.yaml\\n```\\n\\n## Key Components\\n\\n1.
+      **Content Organization**\\n   - Content is organized hierarchically, starting
+      with basic concepts\\n   - The `basics` directory contains foundational chess
+      knowledge\\n   - Current content focuses on chess openings with plans for expansion\\n\\n2.
+      **Technical Implementation**\\n   - Simple Markdown-based documentation structure\\n
+      \  - No external dependencies required\\n   - Git-based version control (indicated
+      by .gitignore)\\n\\n## Current State\\n- Project is in early development with
+      minimal content\\n- Basic structure is established for expansion\\n- Current
+      content covers:\\n  - Project overview (README.md)\\n  - Basic chess openings
+      including King's Pawn (e4) and Queen's Pawn (d4) openings\\n  - Introduction
+      to the Ruy Lopez opening\\n\\n## Development Context\\n- Project uses an AI
+      assistant for content management\\n- Configuration in `.droid/config.yaml` defines
+      interaction parameters\\n- Conversation history is maintained for context continuity\\n\\n##
+      For AI Assistants\\nWhen working with this project:\\n1. Maintain the established
+      directory structure\\n2. Use Markdown formatting for all content files\\n3.
+      Keep content clear and concise\\n4. Respect the hierarchical organization from
+      basics to advanced topics\\n5. Reference specific openings and moves using standard
+      chess notation\\nEND CURRENT PROJECT CONTEXT\\n\\n\",\"tools\":[{\"name\":\"read_file\",\"description\":\"\\n
+      \   Read a file and return its contents. Prepends each line with the line number.
+      Example: \\\"1 |line1 content\\\"\\n    \",\"input_schema\":{\"type\":\"object\",\"properties\":{\"file_path\":{\"type\":\"string\"},\"offset\":{\"type\":\"integer\"}},\"required\":[\"file_path\"]}},{\"name\":\"create_file\",\"description\":\"\\n
+      \   Create a file with the given contents.\\n    \",\"input_schema\":{\"type\":\"object\",\"properties\":{\"file_path\":{\"type\":\"string\"},\"lines\":{\"items\":{\"type\":\"string\"},\"type\":\"array\"},\"trailing_newline\":{\"type\":\"boolean\"}},\"required\":[\"file_path\",\"lines\"]}},{\"name\":\"update_file\",\"description\":\"\\n
+      \   Update a file with the given updates. Each update contains either lines
+      to insert or a range of lines to delete.\\n    Inserting will insert after the
+      specified line. For example, insertion_index 0 will insert at the beginning
+      of the file while insertion_index=1 will insert after line 1, before line 2.
+      insertions will not delete or replace any lines.\\n    Deleting will delete
+      all lines from start_line to end_line, inclusive. This will only delete lines
+      as they existed BEFORE any insertions.\\n    \",\"input_schema\":{\"type\":\"object\",\"properties\":{\"file_path\":{\"type\":\"string\"},\"insertions\":{\"items\":{\"additionalProperties\":true,\"properties\":{\"insertion_index\":{\"title\":\"Insertion
+      Index\",\"type\":\"integer\"},\"lines\":{\"items\":{\"type\":\"string\"},\"title\":\"Lines\",\"type\":\"array\"}},\"required\":[\"insertion_index\",\"lines\"],\"title\":\"InsertLines\",\"type\":\"object\"},\"type\":\"array\"},\"deletions\":{\"items\":{\"additionalProperties\":true,\"properties\":{\"start_line\":{\"title\":\"Start
+      Line\",\"type\":\"integer\"},\"end_line\":{\"title\":\"End Line\",\"type\":\"integer\"}},\"required\":[\"start_line\",\"end_line\"],\"title\":\"DeleteLines\",\"type\":\"object\"},\"type\":\"array\"}},\"required\":[\"file_path\"]}},{\"name\":\"rename_file\",\"description\":\"\\n
+      \   Rename a file.\\n    \",\"input_schema\":{\"type\":\"object\",\"properties\":{\"old_path\":{\"type\":\"string\"},\"new_path\":{\"type\":\"string\"}},\"required\":[\"old_path\",\"new_path\"]}},{\"name\":\"delete_path\",\"description\":\"\\n
+      \   Delete a file or directory.\\n    \",\"input_schema\":{\"type\":\"object\",\"properties\":{\"path\":{\"type\":\"string\"}},\"required\":[\"path\"]}},{\"name\":\"ls\",\"description\":\"\\n
+      \   List contents of a directory.\\n    \",\"input_schema\":{\"type\":\"object\",\"properties\":{\"path\":{\"type\":\"string\"}}}}],\"stream\":true}"
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      anthropic-version:
+      - '2023-06-01'
+      connection:
+      - keep-alive
+      content-length:
+      - '6223'
+      content-type:
+      - application/json
+      host:
+      - api.anthropic.com
+      user-agent:
+      - Anthropic/Python 0.42.0
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - 'false'
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - MacOS
+      x-stainless-package-version:
+      - 0.42.0
+      x-stainless-retry-count:
+      - '0'
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.7
+      x-stainless-stream-helper:
+      - messages
+    method: POST
+    uri: https://api.anthropic.com/v1/messages
+  response:
+    body:
+      string: 'event: message_start
+
+        data: {"type":"message_start","message":{"id":"msg_01CJQco8jwMyxzJmXZKSgHXD","type":"message","role":"assistant","model":"claude-3-5-sonnet-20241022","content":[],"stop_reason":null,"stop_sequence":null,"usage":{"input_tokens":1877,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":1}}        }
+
+
+        event: content_block_start
+
+        data: {"type":"content_block_start","index":0,"content_block":{"type":"text","text":""}      }
+
+
+        event: ping
+
+        data: {"type": "ping"}
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"I"}        }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"''ll
+        help you delete the "}    }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"''old_openings.md''
+        file from"}      }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"
+        the basics directory."}          }
+
+
+        event: content_block_stop
+
+        data: {"type":"content_block_stop","index":0             }
+
+
+        event: content_block_start
+
+        data: {"type":"content_block_start","index":1,"content_block":{"type":"tool_use","id":"toolu_018bPznfeEJ9qUeCLhMW3pts","name":"delete_path","input":{}}        }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":""}      }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"{\"path"}       }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"\":
+        \"basic"}     }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"s/old_openi"}             }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"ngs.md\"}"}    }
+
+
+        event: content_block_stop
+
+        data: {"type":"content_block_stop","index":1    }
+
+
+        event: message_delta
+
+        data: {"type":"message_delta","delta":{"stop_reason":"tool_use","stop_sequence":null},"usage":{"output_tokens":82}             }
+
+
+        event: message_stop
+
+        data: {"type":"message_stop"      }
+
+
+        '
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-RAY:
+      - 8fe9ccf85b147658-SEA
+      Cache-Control:
+      - no-cache
+      Connection:
+      - keep-alive
+      Content-Type:
+      - text/event-stream; charset=utf-8
+      Date:
+      - Wed, 08 Jan 2025 05:31:20 GMT
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      X-Robots-Tag:
+      - none
+      anthropic-ratelimit-input-tokens-limit:
+      - '400000'
+      anthropic-ratelimit-input-tokens-remaining:
+      - '398000'
+      anthropic-ratelimit-input-tokens-reset:
+      - '2025-01-08T05:31:20Z'
+      anthropic-ratelimit-output-tokens-limit:
+      - '80000'
+      anthropic-ratelimit-output-tokens-remaining:
+      - '72000'
+      anthropic-ratelimit-output-tokens-reset:
+      - '2025-01-08T05:31:25Z'
+      anthropic-ratelimit-requests-limit:
+      - '4000'
+      anthropic-ratelimit-requests-remaining:
+      - '3999'
+      anthropic-ratelimit-requests-reset:
+      - '2025-01-08T05:31:19Z'
+      anthropic-ratelimit-tokens-limit:
+      - '480000'
+      anthropic-ratelimit-tokens-remaining:
+      - '470000'
+      anthropic-ratelimit-tokens-reset:
+      - '2025-01-08T05:31:20Z'
+      request-id:
+      - req_011KHANrqF3d4PjKg6z2i2En
+      via:
+      - 1.1 google
+    status:
+      code: 200
+      message: OK
+- request:
+    body: "{\"max_tokens\":8192,\"messages\":[{\"content\":\"rename openings.md to
+      old_openings.md\",\"role\":\"user\"},{\"role\":\"assistant\",\"content\":[{\"type\":\"text\",\"text\":\"I'll
+      help you rename the file 'openings.md' to 'old_openings.md' in the basics directory.
+      Based on the project structure, I can see the file is located at 'basics/openings.md'.\"},{\"id\":\"toolu_018oszEv2R6LdQijTKURu3Rq\",\"input\":{\"old_path\":\"basics/openings.md\",\"new_path\":\"basics/old_openings.md\"},\"name\":\"rename_file\",\"type\":\"tool_use\"}]},{\"role\":\"user\",\"content\":[{\"tool_use_id\":\"toolu_018oszEv2R6LdQijTKURu3Rq\",\"type\":\"tool_result\",\"content\":\"Renamed
+      basics/openings.md to basics/old_openings.md\",\"is_error\":false}]},{\"content\":\"\\n\\nThe
+      file has been successfully renamed from 'openings.md' to 'old_openings.md' while
+      maintaining its location in the basics directory. Is there anything else you'd
+      like me to help you with?\",\"role\":\"assistant\"},{\"content\":\"delete old_openings.md\",\"role\":\"user\"},{\"role\":\"assistant\",\"content\":[{\"type\":\"text\",\"text\":\"I'll
+      help you delete the 'old_openings.md' file from the basics directory.\"},{\"id\":\"toolu_018bPznfeEJ9qUeCLhMW3pts\",\"input\":{\"path\":\"basics/old_openings.md\"},\"name\":\"delete_path\",\"type\":\"tool_use\"}]},{\"role\":\"user\",\"content\":[{\"tool_use_id\":\"toolu_018bPznfeEJ9qUeCLhMW3pts\",\"type\":\"tool_result\",\"content\":\"Deleted
+      file basics/old_openings.md\",\"is_error\":false}]}],\"model\":\"claude-3-5-sonnet-latest\",\"system\":\"You
+      are an expert coding assistant with extensive software development experience.
+      Your role is to help developers manage their projects through natural language
+      commands.\\n\\nYour capabilities include:\\n1. Reading, creating, updating,
+      and deleting files\\n2. Listing directory contents\\n3. Providing detailed explanations
+      of code and project structure\\n4. Following best practices for code maintenance
+      and project organization\\n\\nGuidelines:\\n- Always maintain data integrity
+      and avoid destructive operations without confirmation\\n- When modifying files,
+      be precise and targeted in your changes\\n- Provide clear explanations for your
+      actions and recommendations\\n- If a request is ambiguous, ask for clarification
+      before proceeding\\n- Use your file operation tools carefully and verify paths
+      before modifications\\n\\nCURRENT PROJECT CONTEXT\\n# Chess Guide Project Summary\\n\\n##
+      Project Purpose\\nThis is an educational project designed to provide comprehensive
+      chess instruction, focusing on fundamentals, strategies, and advanced techniques.\\n\\n##
+      Project Structure\\n```\\n.\\n\u251C\u2500\u2500 README.md                 #
+      Project introduction and overview\\n\u251C\u2500\u2500 basics/                   #
+      Core chess concepts\\n\u2502   \u2514\u2500\u2500 openings.md          # Chess
+      opening moves and strategies\\n\u2514\u2500\u2500 .droid/                  #
+      Project configuration and conversation history\\n    \u251C\u2500\u2500 config.yaml
+      \         # AI assistant configuration\\n    \u251C\u2500\u2500 .gitignore\\n
+      \   \u2514\u2500\u2500 conversations/       # History of project interactions\\n
+      \       \u2514\u2500\u2500 latest.yaml\\n```\\n\\n## Key Components\\n\\n1.
+      **Content Organization**\\n   - Content is organized hierarchically, starting
+      with basic concepts\\n   - The `basics` directory contains foundational chess
+      knowledge\\n   - Current content focuses on chess openings with plans for expansion\\n\\n2.
+      **Technical Implementation**\\n   - Simple Markdown-based documentation structure\\n
+      \  - No external dependencies required\\n   - Git-based version control (indicated
+      by .gitignore)\\n\\n## Current State\\n- Project is in early development with
+      minimal content\\n- Basic structure is established for expansion\\n- Current
+      content covers:\\n  - Project overview (README.md)\\n  - Basic chess openings
+      including King's Pawn (e4) and Queen's Pawn (d4) openings\\n  - Introduction
+      to the Ruy Lopez opening\\n\\n## Development Context\\n- Project uses an AI
+      assistant for content management\\n- Configuration in `.droid/config.yaml` defines
+      interaction parameters\\n- Conversation history is maintained for context continuity\\n\\n##
+      For AI Assistants\\nWhen working with this project:\\n1. Maintain the established
+      directory structure\\n2. Use Markdown formatting for all content files\\n3.
+      Keep content clear and concise\\n4. Respect the hierarchical organization from
+      basics to advanced topics\\n5. Reference specific openings and moves using standard
+      chess notation\\nEND CURRENT PROJECT CONTEXT\\n\\n\",\"tools\":[{\"name\":\"read_file\",\"description\":\"\\n
+      \   Read a file and return its contents. Prepends each line with the line number.
+      Example: \\\"1 |line1 content\\\"\\n    \",\"input_schema\":{\"type\":\"object\",\"properties\":{\"file_path\":{\"type\":\"string\"},\"offset\":{\"type\":\"integer\"}},\"required\":[\"file_path\"]}},{\"name\":\"create_file\",\"description\":\"\\n
+      \   Create a file with the given contents.\\n    \",\"input_schema\":{\"type\":\"object\",\"properties\":{\"file_path\":{\"type\":\"string\"},\"lines\":{\"items\":{\"type\":\"string\"},\"type\":\"array\"},\"trailing_newline\":{\"type\":\"boolean\"}},\"required\":[\"file_path\",\"lines\"]}},{\"name\":\"update_file\",\"description\":\"\\n
+      \   Update a file with the given updates. Each update contains either lines
+      to insert or a range of lines to delete.\\n    Inserting will insert after the
+      specified line. For example, insertion_index 0 will insert at the beginning
+      of the file while insertion_index=1 will insert after line 1, before line 2.
+      insertions will not delete or replace any lines.\\n    Deleting will delete
+      all lines from start_line to end_line, inclusive. This will only delete lines
+      as they existed BEFORE any insertions.\\n    \",\"input_schema\":{\"type\":\"object\",\"properties\":{\"file_path\":{\"type\":\"string\"},\"insertions\":{\"items\":{\"additionalProperties\":true,\"properties\":{\"insertion_index\":{\"title\":\"Insertion
+      Index\",\"type\":\"integer\"},\"lines\":{\"items\":{\"type\":\"string\"},\"title\":\"Lines\",\"type\":\"array\"}},\"required\":[\"insertion_index\",\"lines\"],\"title\":\"InsertLines\",\"type\":\"object\"},\"type\":\"array\"},\"deletions\":{\"items\":{\"additionalProperties\":true,\"properties\":{\"start_line\":{\"title\":\"Start
+      Line\",\"type\":\"integer\"},\"end_line\":{\"title\":\"End Line\",\"type\":\"integer\"}},\"required\":[\"start_line\",\"end_line\"],\"title\":\"DeleteLines\",\"type\":\"object\"},\"type\":\"array\"}},\"required\":[\"file_path\"]}},{\"name\":\"rename_file\",\"description\":\"\\n
+      \   Rename a file.\\n    \",\"input_schema\":{\"type\":\"object\",\"properties\":{\"old_path\":{\"type\":\"string\"},\"new_path\":{\"type\":\"string\"}},\"required\":[\"old_path\",\"new_path\"]}},{\"name\":\"delete_path\",\"description\":\"\\n
+      \   Delete a file or directory.\\n    \",\"input_schema\":{\"type\":\"object\",\"properties\":{\"path\":{\"type\":\"string\"}},\"required\":[\"path\"]}},{\"name\":\"ls\",\"description\":\"\\n
+      \   List contents of a directory.\\n    \",\"input_schema\":{\"type\":\"object\",\"properties\":{\"path\":{\"type\":\"string\"}}}}],\"stream\":true}"
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      anthropic-version:
+      - '2023-06-01'
+      connection:
+      - keep-alive
+      content-length:
+      - '6640'
+      content-type:
+      - application/json
+      host:
+      - api.anthropic.com
+      user-agent:
+      - Anthropic/Python 0.42.0
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - 'false'
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - MacOS
+      x-stainless-package-version:
+      - 0.42.0
+      x-stainless-retry-count:
+      - '0'
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.7
+      x-stainless-stream-helper:
+      - messages
+    method: POST
+    uri: https://api.anthropic.com/v1/messages
+  response:
+    body:
+      string: 'event: message_start
+
+        data: {"type":"message_start","message":{"id":"msg_01NPBMf3AWiq9i58HDZRkQ6B","type":"message","role":"assistant","model":"claude-3-5-sonnet-20241022","content":[],"stop_reason":null,"stop_sequence":null,"usage":{"input_tokens":1981,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":5}}}
+
+
+        event: content_block_start
+
+        data: {"type":"content_block_start","index":0,"content_block":{"type":"text","text":""}       }
+
+
+        event: ping
+
+        data: {"type": "ping"}
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"\n\nThe
+        file ''"} }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"old_openings.md''
+        has been successfully"}}
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"
+        deleted from the basics directory. Is"}            }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"
+        there anything else you''d like me to help"}}
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"
+        you with?"}     }
+
+
+        event: content_block_stop
+
+        data: {"type":"content_block_stop","index":0         }
+
+
+        event: message_delta
+
+        data: {"type":"message_delta","delta":{"stop_reason":"end_turn","stop_sequence":null},"usage":{"output_tokens":37}       }
+
+
+        event: message_stop
+
+        data: {"type":"message_stop" }
+
+
+        '
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-RAY:
+      - 8fe9cd091ce77658-SEA
+      Cache-Control:
+      - no-cache
+      Connection:
+      - keep-alive
+      Content-Type:
+      - text/event-stream; charset=utf-8
+      Date:
+      - Wed, 08 Jan 2025 05:31:23 GMT
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      X-Robots-Tag:
+      - none
+      anthropic-ratelimit-input-tokens-limit:
+      - '400000'
+      anthropic-ratelimit-input-tokens-remaining:
+      - '398000'
+      anthropic-ratelimit-input-tokens-reset:
+      - '2025-01-08T05:31:22Z'
+      anthropic-ratelimit-output-tokens-limit:
+      - '80000'
+      anthropic-ratelimit-output-tokens-remaining:
+      - '72000'
+      anthropic-ratelimit-output-tokens-reset:
+      - '2025-01-08T05:31:28Z'
+      anthropic-ratelimit-requests-limit:
+      - '4000'
+      anthropic-ratelimit-requests-remaining:
+      - '3999'
+      anthropic-ratelimit-requests-reset:
+      - '2025-01-08T05:31:22Z'
+      anthropic-ratelimit-tokens-limit:
+      - '480000'
+      anthropic-ratelimit-tokens-remaining:
+      - '470000'
+      anthropic-ratelimit-tokens-reset:
+      - '2025-01-08T05:31:22Z'
+      request-id:
+      - req_01WUoQhMwDfpPZC7VTZ6MMgn
+      via:
+      - 1.1 google
+    status:
+      code: 200
+      message: OK
+version: 1

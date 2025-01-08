@@ -1,0 +1,940 @@
+interactions:
+- request:
+    body: '{"max_tokens":8192,"messages":[{"content":"create a README.md with a chess
+      guide introduction create an basics/openings.md file explaining basic chess
+      openings. Limit both files to a 20 word in total. We will write the rest of
+      the files later.","role":"user"}],"model":"claude-3-5-sonnet-latest","system":"You
+      are an expert coding assistant with extensive software development experience.
+      Your role is to help developers manage their projects through natural language
+      commands.\n\nYour capabilities include:\n1. Reading, creating, updating, and
+      deleting files\n2. Listing directory contents\n3. Providing detailed explanations
+      of code and project structure\n4. Following best practices for code maintenance
+      and project organization\n\nGuidelines:\n- Always maintain data integrity and
+      avoid destructive operations without confirmation\n- When modifying files, be
+      precise and targeted in your changes\n- Provide clear explanations for your
+      actions and recommendations\n- If a request is ambiguous, ask for clarification
+      before proceeding\n- Use your file operation tools carefully and verify paths
+      before modifications\n\n\n\n","tools":[{"name":"read_file","description":"\n    Read
+      a file and return its contents. Prepends each line with the line number. Example:
+      \"1 |line1 content\"\n    ","input_schema":{"type":"object","properties":{"file_path":{"type":"string"},"offset":{"type":"integer"}},"required":["file_path"]}},{"name":"create_file","description":"\n    Create
+      a file with the given contents.\n    ","input_schema":{"type":"object","properties":{"file_path":{"type":"string"},"lines":{"items":{"type":"string"},"type":"array"},"trailing_newline":{"type":"boolean"}},"required":["file_path","lines"]}},{"name":"update_file","description":"\n    Update
+      a file with the given updates. Each update contains either lines to insert or
+      a range of lines to delete.\n    Inserting will insert after the specified line.
+      For example, insertion_index 0 will insert at the beginning of the file while
+      insertion_index=1 will insert after line 1, before line 2. insertions will not
+      delete or replace any lines.\n    Deleting will delete all lines from start_line
+      to end_line, inclusive. This will only delete lines as they existed BEFORE any
+      insertions.\n    ","input_schema":{"type":"object","properties":{"file_path":{"type":"string"},"insertions":{"items":{"additionalProperties":true,"properties":{"insertion_index":{"title":"Insertion
+      Index","type":"integer"},"lines":{"items":{"type":"string"},"title":"Lines","type":"array"}},"required":["insertion_index","lines"],"title":"InsertLines","type":"object"},"type":"array"},"deletions":{"items":{"additionalProperties":true,"properties":{"start_line":{"title":"Start
+      Line","type":"integer"},"end_line":{"title":"End Line","type":"integer"}},"required":["start_line","end_line"],"title":"DeleteLines","type":"object"},"type":"array"}},"required":["file_path"]}},{"name":"rename_file","description":"\n    Rename
+      a file.\n    ","input_schema":{"type":"object","properties":{"old_path":{"type":"string"},"new_path":{"type":"string"}},"required":["old_path","new_path"]}},{"name":"delete_path","description":"\n    Delete
+      a file or directory.\n    ","input_schema":{"type":"object","properties":{"path":{"type":"string"}},"required":["path"]}},{"name":"ls","description":"\n    List
+      contents of a directory.\n    ","input_schema":{"type":"object","properties":{"path":{"type":"string"}}}}],"stream":true}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      anthropic-version:
+      - '2023-06-01'
+      connection:
+      - keep-alive
+      content-length:
+      - '3451'
+      content-type:
+      - application/json
+      host:
+      - api.anthropic.com
+      user-agent:
+      - Anthropic/Python 0.42.0
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - 'false'
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - MacOS
+      x-stainless-package-version:
+      - 0.42.0
+      x-stainless-retry-count:
+      - '0'
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.7
+      x-stainless-stream-helper:
+      - messages
+    method: POST
+    uri: https://api.anthropic.com/v1/messages
+  response:
+    body:
+      string: 'event: message_start
+
+        data: {"type":"message_start","message":{"id":"msg_015jt4oSA9nC85W6Z6q7MEwo","type":"message","role":"assistant","model":"claude-3-5-sonnet-20241022","content":[],"stop_reason":null,"stop_sequence":null,"usage":{"input_tokens":1254,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":1}}   }
+
+
+        event: content_block_start
+
+        data: {"type":"content_block_start","index":0,"content_block":{"type":"text","text":""}     }
+
+
+        event: ping
+
+        data: {"type": "ping"}
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"I"}      }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"''ll
+        help you create these two files with brief"}   }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"
+        introductions, keeping them under 20 words"}          }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"
+        each.\n\nFirst, let''s"} }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"
+        create the README.md:"}}
+
+
+        event: content_block_stop
+
+        data: {"type":"content_block_stop","index":0       }
+
+
+        event: content_block_start
+
+        data: {"type":"content_block_start","index":1,"content_block":{"type":"tool_use","id":"toolu_012X3ofjMUAeK8ThiEozu5XF","name":"create_file","input":{}}    }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":""}     }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"{\"fil"}   }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"e_path"}             }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"\":
+        \"README.m"}     }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"d\""}            }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":",
+        \"lines\": ["}             }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"\"#
+        Chess G"}               }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"uide\",
+        \"\","}        }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"
+        \"A comprehe"}              }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"nsive
+        gu"}              }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"id"}           }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"e
+        "}              }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"to
+        "}        }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"chess
+        fu"}            }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"ndament"}             }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"al"}        }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"s,
+        stra"}            }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"tegie"}    }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"s,
+        and adv"}         }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"anced
+        t"}              }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"echn"}  }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"iq"}    }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"ues"}           }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":".\"]}"}           }
+
+
+        event: content_block_stop
+
+        data: {"type":"content_block_stop","index":1               }
+
+
+        event: message_delta
+
+        data: {"type":"message_delta","delta":{"stop_reason":"tool_use","stop_sequence":null},"usage":{"output_tokens":129}    }
+
+
+        event: message_stop
+
+        data: {"type":"message_stop"    }
+
+
+        '
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-RAY:
+      - 8fe9cb137e756ce2-SEA
+      Cache-Control:
+      - no-cache
+      Connection:
+      - keep-alive
+      Content-Type:
+      - text/event-stream; charset=utf-8
+      Date:
+      - Wed, 08 Jan 2025 05:30:04 GMT
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      X-Robots-Tag:
+      - none
+      anthropic-ratelimit-input-tokens-limit:
+      - '400000'
+      anthropic-ratelimit-input-tokens-remaining:
+      - '399000'
+      anthropic-ratelimit-input-tokens-reset:
+      - '2025-01-08T05:30:02Z'
+      anthropic-ratelimit-output-tokens-limit:
+      - '80000'
+      anthropic-ratelimit-output-tokens-remaining:
+      - '72000'
+      anthropic-ratelimit-output-tokens-reset:
+      - '2025-01-08T05:30:08Z'
+      anthropic-ratelimit-requests-limit:
+      - '4000'
+      anthropic-ratelimit-requests-remaining:
+      - '3999'
+      anthropic-ratelimit-requests-reset:
+      - '2025-01-08T05:30:02Z'
+      anthropic-ratelimit-tokens-limit:
+      - '480000'
+      anthropic-ratelimit-tokens-remaining:
+      - '471000'
+      anthropic-ratelimit-tokens-reset:
+      - '2025-01-08T05:30:02Z'
+      request-id:
+      - req_0197KRZNeKS3U4wtPbsGTAPB
+      via:
+      - 1.1 google
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"max_tokens":8192,"messages":[{"content":"create a README.md with a chess
+      guide introduction create an basics/openings.md file explaining basic chess
+      openings. Limit both files to a 20 word in total. We will write the rest of
+      the files later.","role":"user"},{"role":"assistant","content":[{"type":"text","text":"I''ll
+      help you create these two files with brief introductions, keeping them under
+      20 words each.\n\nFirst, let''s create the README.md:"},{"id":"toolu_012X3ofjMUAeK8ThiEozu5XF","input":{"file_path":"README.md","lines":["#
+      Chess Guide","","A comprehensive guide to chess fundamentals, strategies, and
+      advanced techniques."]},"name":"create_file","type":"tool_use"}]},{"role":"user","content":[{"tool_use_id":"toolu_012X3ofjMUAeK8ThiEozu5XF","type":"tool_result","content":"null\n...\n","is_error":false}]}],"model":"claude-3-5-sonnet-latest","system":"You
+      are an expert coding assistant with extensive software development experience.
+      Your role is to help developers manage their projects through natural language
+      commands.\n\nYour capabilities include:\n1. Reading, creating, updating, and
+      deleting files\n2. Listing directory contents\n3. Providing detailed explanations
+      of code and project structure\n4. Following best practices for code maintenance
+      and project organization\n\nGuidelines:\n- Always maintain data integrity and
+      avoid destructive operations without confirmation\n- When modifying files, be
+      precise and targeted in your changes\n- Provide clear explanations for your
+      actions and recommendations\n- If a request is ambiguous, ask for clarification
+      before proceeding\n- Use your file operation tools carefully and verify paths
+      before modifications\n\n\n\n","tools":[{"name":"read_file","description":"\n    Read
+      a file and return its contents. Prepends each line with the line number. Example:
+      \"1 |line1 content\"\n    ","input_schema":{"type":"object","properties":{"file_path":{"type":"string"},"offset":{"type":"integer"}},"required":["file_path"]}},{"name":"create_file","description":"\n    Create
+      a file with the given contents.\n    ","input_schema":{"type":"object","properties":{"file_path":{"type":"string"},"lines":{"items":{"type":"string"},"type":"array"},"trailing_newline":{"type":"boolean"}},"required":["file_path","lines"]}},{"name":"update_file","description":"\n    Update
+      a file with the given updates. Each update contains either lines to insert or
+      a range of lines to delete.\n    Inserting will insert after the specified line.
+      For example, insertion_index 0 will insert at the beginning of the file while
+      insertion_index=1 will insert after line 1, before line 2. insertions will not
+      delete or replace any lines.\n    Deleting will delete all lines from start_line
+      to end_line, inclusive. This will only delete lines as they existed BEFORE any
+      insertions.\n    ","input_schema":{"type":"object","properties":{"file_path":{"type":"string"},"insertions":{"items":{"additionalProperties":true,"properties":{"insertion_index":{"title":"Insertion
+      Index","type":"integer"},"lines":{"items":{"type":"string"},"title":"Lines","type":"array"}},"required":["insertion_index","lines"],"title":"InsertLines","type":"object"},"type":"array"},"deletions":{"items":{"additionalProperties":true,"properties":{"start_line":{"title":"Start
+      Line","type":"integer"},"end_line":{"title":"End Line","type":"integer"}},"required":["start_line","end_line"],"title":"DeleteLines","type":"object"},"type":"array"}},"required":["file_path"]}},{"name":"rename_file","description":"\n    Rename
+      a file.\n    ","input_schema":{"type":"object","properties":{"old_path":{"type":"string"},"new_path":{"type":"string"}},"required":["old_path","new_path"]}},{"name":"delete_path","description":"\n    Delete
+      a file or directory.\n    ","input_schema":{"type":"object","properties":{"path":{"type":"string"}},"required":["path"]}},{"name":"ls","description":"\n    List
+      contents of a directory.\n    ","input_schema":{"type":"object","properties":{"path":{"type":"string"}}}}],"stream":true}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      anthropic-version:
+      - '2023-06-01'
+      connection:
+      - keep-alive
+      content-length:
+      - '4009'
+      content-type:
+      - application/json
+      host:
+      - api.anthropic.com
+      user-agent:
+      - Anthropic/Python 0.42.0
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - 'false'
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - MacOS
+      x-stainless-package-version:
+      - 0.42.0
+      x-stainless-retry-count:
+      - '0'
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.7
+      x-stainless-stream-helper:
+      - messages
+    method: POST
+    uri: https://api.anthropic.com/v1/messages
+  response:
+    body:
+      string: 'event: message_start
+
+        data: {"type":"message_start","message":{"id":"msg_01JC18pK4HodTQLQn5wHYz8u","type":"message","role":"assistant","model":"claude-3-5-sonnet-20241022","content":[],"stop_reason":null,"stop_sequence":null,"usage":{"input_tokens":1398,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":5}}      }
+
+
+        event: content_block_start
+
+        data: {"type":"content_block_start","index":0,"content_block":{"type":"text","text":""}        }
+
+
+        event: ping
+
+        data: {"type": "ping"}
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"\n\nNow,
+        let''s"}       }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"
+        create the basics/openings.md file."}    }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"
+        First, we need to ensure the basics"}            }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"
+        directory exists:"}   }
+
+
+        event: content_block_stop
+
+        data: {"type":"content_block_stop","index":0   }
+
+
+        event: content_block_start
+
+        data: {"type":"content_block_start","index":1,"content_block":{"type":"tool_use","id":"toolu_014VTXkMzJkg4a11ZDsCTvUY","name":"create_file","input":{}}   }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":""}            }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"{\"fi"}             }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"le_p"}
+        }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"ath\":
+        \"b"}         }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"as"}       }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"ics/opening"}      }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"s.md\""}        }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":",
+        "}         }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"\"lines\":"}   }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"
+        [\"# Che"}             }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"ss
+        "}           }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"Openings\",
+        "}              }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"\"\",
+        \"C"}          }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"ommon
+        ch"}               }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"ess
+        open"}     }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"ings:"}   }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"
+        1. e4"} }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"
+        (K"}    }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"in"}               }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"g''"}      }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"s
+        P"}          }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"awn)"}          }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"
+        a"}        }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"nd
+        1"}        }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":".
+        d"}      }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"4
+        (Qu"}  }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"een''s
+        Paw"} }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"n)
+        "} }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"ar"}     }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"e
+        pop"}    }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"ular
+        st"}               }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"arti"}        }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"ng
+        mo"}   }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":1,"delta":{"type":"input_json_delta","partial_json":"ves.\"]}"}   }
+
+
+        event: content_block_stop
+
+        data: {"type":"content_block_stop","index":1             }
+
+
+        event: message_delta
+
+        data: {"type":"message_delta","delta":{"stop_reason":"tool_use","stop_sequence":null},"usage":{"output_tokens":150}      }
+
+
+        event: message_stop
+
+        data: {"type":"message_stop"              }
+
+
+        '
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-RAY:
+      - 8fe9cb32ee766ce2-SEA
+      Cache-Control:
+      - no-cache
+      Connection:
+      - keep-alive
+      Content-Type:
+      - text/event-stream; charset=utf-8
+      Date:
+      - Wed, 08 Jan 2025 05:30:08 GMT
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      X-Robots-Tag:
+      - none
+      anthropic-ratelimit-input-tokens-limit:
+      - '400000'
+      anthropic-ratelimit-input-tokens-remaining:
+      - '399000'
+      anthropic-ratelimit-input-tokens-reset:
+      - '2025-01-08T05:30:07Z'
+      anthropic-ratelimit-output-tokens-limit:
+      - '80000'
+      anthropic-ratelimit-output-tokens-remaining:
+      - '72000'
+      anthropic-ratelimit-output-tokens-reset:
+      - '2025-01-08T05:30:13Z'
+      anthropic-ratelimit-requests-limit:
+      - '4000'
+      anthropic-ratelimit-requests-remaining:
+      - '3999'
+      anthropic-ratelimit-requests-reset:
+      - '2025-01-08T05:30:07Z'
+      anthropic-ratelimit-tokens-limit:
+      - '480000'
+      anthropic-ratelimit-tokens-remaining:
+      - '471000'
+      anthropic-ratelimit-tokens-reset:
+      - '2025-01-08T05:30:07Z'
+      request-id:
+      - req_01YcA3tcNpLy3atkRJ8A31bW
+      via:
+      - 1.1 google
+    status:
+      code: 200
+      message: OK
+- request:
+    body: '{"max_tokens":8192,"messages":[{"content":"create a README.md with a chess
+      guide introduction create an basics/openings.md file explaining basic chess
+      openings. Limit both files to a 20 word in total. We will write the rest of
+      the files later.","role":"user"},{"role":"assistant","content":[{"type":"text","text":"I''ll
+      help you create these two files with brief introductions, keeping them under
+      20 words each.\n\nFirst, let''s create the README.md:"},{"id":"toolu_012X3ofjMUAeK8ThiEozu5XF","input":{"file_path":"README.md","lines":["#
+      Chess Guide","","A comprehensive guide to chess fundamentals, strategies, and
+      advanced techniques."]},"name":"create_file","type":"tool_use"}]},{"role":"user","content":[{"tool_use_id":"toolu_012X3ofjMUAeK8ThiEozu5XF","type":"tool_result","content":"null\n...\n","is_error":false}]},{"role":"assistant","content":[{"type":"text","text":"\n\nNow,
+      let''s create the basics/openings.md file. First, we need to ensure the basics
+      directory exists:"},{"id":"toolu_014VTXkMzJkg4a11ZDsCTvUY","input":{"file_path":"basics/openings.md","lines":["#
+      Chess Openings","","Common chess openings: 1. e4 (King''s Pawn) and 1. d4 (Queen''s
+      Pawn) are popular starting moves."]},"name":"create_file","type":"tool_use"}]},{"role":"user","content":[{"tool_use_id":"toolu_014VTXkMzJkg4a11ZDsCTvUY","type":"tool_result","content":"null\n...\n","is_error":false}]}],"model":"claude-3-5-sonnet-latest","system":"You
+      are an expert coding assistant with extensive software development experience.
+      Your role is to help developers manage their projects through natural language
+      commands.\n\nYour capabilities include:\n1. Reading, creating, updating, and
+      deleting files\n2. Listing directory contents\n3. Providing detailed explanations
+      of code and project structure\n4. Following best practices for code maintenance
+      and project organization\n\nGuidelines:\n- Always maintain data integrity and
+      avoid destructive operations without confirmation\n- When modifying files, be
+      precise and targeted in your changes\n- Provide clear explanations for your
+      actions and recommendations\n- If a request is ambiguous, ask for clarification
+      before proceeding\n- Use your file operation tools carefully and verify paths
+      before modifications\n\n\n\n","tools":[{"name":"read_file","description":"\n    Read
+      a file and return its contents. Prepends each line with the line number. Example:
+      \"1 |line1 content\"\n    ","input_schema":{"type":"object","properties":{"file_path":{"type":"string"},"offset":{"type":"integer"}},"required":["file_path"]}},{"name":"create_file","description":"\n    Create
+      a file with the given contents.\n    ","input_schema":{"type":"object","properties":{"file_path":{"type":"string"},"lines":{"items":{"type":"string"},"type":"array"},"trailing_newline":{"type":"boolean"}},"required":["file_path","lines"]}},{"name":"update_file","description":"\n    Update
+      a file with the given updates. Each update contains either lines to insert or
+      a range of lines to delete.\n    Inserting will insert after the specified line.
+      For example, insertion_index 0 will insert at the beginning of the file while
+      insertion_index=1 will insert after line 1, before line 2. insertions will not
+      delete or replace any lines.\n    Deleting will delete all lines from start_line
+      to end_line, inclusive. This will only delete lines as they existed BEFORE any
+      insertions.\n    ","input_schema":{"type":"object","properties":{"file_path":{"type":"string"},"insertions":{"items":{"additionalProperties":true,"properties":{"insertion_index":{"title":"Insertion
+      Index","type":"integer"},"lines":{"items":{"type":"string"},"title":"Lines","type":"array"}},"required":["insertion_index","lines"],"title":"InsertLines","type":"object"},"type":"array"},"deletions":{"items":{"additionalProperties":true,"properties":{"start_line":{"title":"Start
+      Line","type":"integer"},"end_line":{"title":"End Line","type":"integer"}},"required":["start_line","end_line"],"title":"DeleteLines","type":"object"},"type":"array"}},"required":["file_path"]}},{"name":"rename_file","description":"\n    Rename
+      a file.\n    ","input_schema":{"type":"object","properties":{"old_path":{"type":"string"},"new_path":{"type":"string"}},"required":["old_path","new_path"]}},{"name":"delete_path","description":"\n    Delete
+      a file or directory.\n    ","input_schema":{"type":"object","properties":{"path":{"type":"string"}},"required":["path"]}},{"name":"ls","description":"\n    List
+      contents of a directory.\n    ","input_schema":{"type":"object","properties":{"path":{"type":"string"}}}}],"stream":true}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate
+      anthropic-version:
+      - '2023-06-01'
+      connection:
+      - keep-alive
+      content-length:
+      - '4563'
+      content-type:
+      - application/json
+      host:
+      - api.anthropic.com
+      user-agent:
+      - Anthropic/Python 0.42.0
+      x-stainless-arch:
+      - x64
+      x-stainless-async:
+      - 'false'
+      x-stainless-lang:
+      - python
+      x-stainless-os:
+      - MacOS
+      x-stainless-package-version:
+      - 0.42.0
+      x-stainless-retry-count:
+      - '0'
+      x-stainless-runtime:
+      - CPython
+      x-stainless-runtime-version:
+      - 3.11.7
+      x-stainless-stream-helper:
+      - messages
+    method: POST
+    uri: https://api.anthropic.com/v1/messages
+  response:
+    body:
+      string: 'event: message_start
+
+        data: {"type":"message_start","message":{"id":"msg_01RrRf8gd4zKZezjEtc88ApQ","type":"message","role":"assistant","model":"claude-3-5-sonnet-20241022","content":[],"stop_reason":null,"stop_sequence":null,"usage":{"input_tokens":1563,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":2}}  }
+
+
+        event: content_block_start
+
+        data: {"type":"content_block_start","index":0,"content_block":{"type":"text","text":""}        }
+
+
+        event: ping
+
+        data: {"type": "ping"}
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"\n\nI"}     }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"''ve
+        created both files with concise introduct"}            }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"ory
+        content:\n1. README.m"}        }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"d
+        contains a title and a"}   }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"
+        brief description of the guide"}     }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"\n2.
+        basics/open"}        }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"ings.md
+        contains a title and basic"}          }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"
+        information about the two most common opening"}          }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"
+        moves\n\nBoth files are kept"}        }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"
+        under 20 words and provide a foundation"}}
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"
+        that we can expand upon later. Would you"}         }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"
+        like to verify the content of either"}    }
+
+
+        event: content_block_delta
+
+        data: {"type":"content_block_delta","index":0,"delta":{"type":"text_delta","text":"
+        file?"}}
+
+
+        event: content_block_stop
+
+        data: {"type":"content_block_stop","index":0        }
+
+
+        event: message_delta
+
+        data: {"type":"message_delta","delta":{"stop_reason":"end_turn","stop_sequence":null},"usage":{"output_tokens":87}             }
+
+
+        event: message_stop
+
+        data: {"type":"message_stop"      }
+
+
+        '
+    headers:
+      CF-Cache-Status:
+      - DYNAMIC
+      CF-RAY:
+      - 8fe9cb461ea96ce2-SEA
+      Cache-Control:
+      - no-cache
+      Connection:
+      - keep-alive
+      Content-Type:
+      - text/event-stream; charset=utf-8
+      Date:
+      - Wed, 08 Jan 2025 05:30:11 GMT
+      Server:
+      - cloudflare
+      Transfer-Encoding:
+      - chunked
+      X-Robots-Tag:
+      - none
+      anthropic-ratelimit-input-tokens-limit:
+      - '400000'
+      anthropic-ratelimit-input-tokens-remaining:
+      - '398000'
+      anthropic-ratelimit-input-tokens-reset:
+      - '2025-01-08T05:30:10Z'
+      anthropic-ratelimit-output-tokens-limit:
+      - '80000'
+      anthropic-ratelimit-output-tokens-remaining:
+      - '72000'
+      anthropic-ratelimit-output-tokens-reset:
+      - '2025-01-08T05:30:16Z'
+      anthropic-ratelimit-requests-limit:
+      - '4000'
+      anthropic-ratelimit-requests-remaining:
+      - '3999'
+      anthropic-ratelimit-requests-reset:
+      - '2025-01-08T05:30:10Z'
+      anthropic-ratelimit-tokens-limit:
+      - '480000'
+      anthropic-ratelimit-tokens-remaining:
+      - '470000'
+      anthropic-ratelimit-tokens-reset:
+      - '2025-01-08T05:30:10Z'
+      request-id:
+      - req_01Thp5w5u5MRgySNSKeoyrEh
+      via:
+      - 1.1 google
+    status:
+      code: 200
+      message: OK
+version: 1

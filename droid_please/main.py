@@ -246,7 +246,7 @@ def summarize(
     file: Annotated[Optional[Path], typer.Option("--file", "-f")] = None,
 ):
     """
-    Create a new summary from an existing conversation.
+    Create a new conversation by summarizing an existing conversation.
     """
     _load_config()
     loc = file or latest_loc_path()
@@ -276,7 +276,7 @@ def _summarize(loc):
             tools=[ls, read_file],
         ):
             if isinstance(chunk, ResponseChunk):
-                status.update(f"summarizing...")
+                status.update("summarizing...")
                 chunks.append(chunk.content)
                 status_portion = (status_portion + chunk.content)[-50:].split("\n")[-1]
         agent = Agent(
