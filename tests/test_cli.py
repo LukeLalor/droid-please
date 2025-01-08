@@ -76,6 +76,7 @@ def test_learn(tmp_project):
     # Create some files first
     runner.invoke(app, ["learn"])
     result = runner.invoke(app, ["please", "tell me about this project"])
+    _check_exit_code(result)
     assert "chess" in result.stdout.lower()
 
 
@@ -98,4 +99,12 @@ def test_delete_file(tmp_project):
 
 
 def _check_exit_code(result: Result):
-    assert result.exit_code == 0, dict(stdout=result.stdout, stderr=result.stderr)
+    try:
+        stdout = result.stdout
+    except ValueError:
+        stdout = None
+    try:
+        stderr = result.stderr
+    except ValueError:
+        stderr = None
+    assert result.exit_code == 0, dict(stdout=stdout, stderr=stderr)
