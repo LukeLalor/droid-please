@@ -3,6 +3,7 @@ import tempfile
 import os
 from pathlib import Path
 
+from click.testing import Result
 from dotenv import load_dotenv
 from typer.testing import CliRunner
 from droid_please.main import app
@@ -33,7 +34,7 @@ def tmp_project():
 def test_init_command(tmp_project):
     """Test project initialization command."""
     result = runner.invoke(app, ["init", str(tmp_project)])
-    assert result.exit_code == 0
+    _check_exit_code(result)
     assert (tmp_project / ".droid").exists()
 
 
@@ -48,7 +49,7 @@ def test_please(tmp_project):
     )
 
     result = runner.invoke(app, ["please", command])
-    assert result.exit_code == 0
+    _check_exit_code(result)
 
     # Verify created files and directories
     assert (tmp_project / "README.md").exists()
@@ -61,7 +62,7 @@ def test_continue(tmp_project):
     """Test updating existing files using natural language commands."""
     # Create initial file
     result = runner.invoke(app, ["continue", "Add the Ruy Lopez to the openings file"])
-    assert result.exit_code == 0
+    _check_exit_code(result)
 
     # Verify content was updated
     with open(tmp_project / "basics" / "openings.md") as f:
@@ -83,7 +84,7 @@ def test_rename_file(tmp_project):
     """Test renaming files using natural language commands."""
     # Create a file first
     result = runner.invoke(app, ["please", "rename openings.md to old_openings.md"])
-    assert result.exit_code == 0
+    _check_exit_code(result)
     assert (tmp_project / "basics" / "old_openings.md").exists()
 
 
@@ -92,5 +93,9 @@ def test_delete_file(tmp_project):
     """Test deleting files using natural language commands."""
     # Create a file first
     result = runner.invoke(app, ["continue", "delete old_openings.md"])
-    assert result.exit_code == 0
+    _check_exit_code(result)
     assert not (tmp_project / "basics" / "old_openings.md").exists()
+
+
+def _check_exit_code(result: Result):
+    assert result.exit_code == 0, dict(stdout=result.stdout, stderr=result.stderr)
