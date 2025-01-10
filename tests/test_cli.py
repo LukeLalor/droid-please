@@ -109,4 +109,6 @@ def _check_exit_code(result: Result):
         stderr = result.stderr
     except ValueError:
         stderr = None
+    if result.exception:
+        raise result.exception
     assert result.exit_code == 0, dict(stdout=stdout, stderr=stderr)
