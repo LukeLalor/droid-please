@@ -159,4 +159,4 @@ def ls(path: str = "."):
     loc = Path(config().project_root).joinpath(path)
     if not loc.exists():
         raise FileNotFoundError(f"Directory not found: {path}")
-    return sorted((dict(name=p.name, is_dir=p.is_dir()) for p in loc.iterdir()), key=lambda x: x["name"])
+    return sorted((dict(name=p.name, is_dir=p.is_dir()) for p in loc.iterdir() if p.name != ".droid"), key=lambda x: x["name"])
