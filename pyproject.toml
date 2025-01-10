@@ -4,6 +4,7 @@ version = "0.0.5"
 description = "Simple cli for genai project management"
 authors = ["Luke Lalor <lukehlalor@gmail.com>"]
 readme = "README.md"
+include = ["README.md"]
 
 [tool.poetry.scripts]
 droid = "droid_please.main:app"
