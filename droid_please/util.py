@@ -29,7 +29,7 @@ def callable_params_as_json_schema(func: Callable) -> SchemaWrapper:
 
     adapters = {param: TypeAdapter(typ) for param, typ in type_hints.items() if param != "return"}
 
-    properties = {p: a.json_schema() for p, a in adapters.items()}
+    properties = {p: a.json_schema(mode='serialization') for p, a in adapters.items()}
 
     defs = {}
     for schema in properties.values():

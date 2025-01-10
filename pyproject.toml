@@ -9,7 +9,7 @@ readme = "README.md"
 droid = "droid_please.main:app"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.11"
 anthropic = "^0.42.0"
 typer = "^0.15.1"
 rich = "^13.9.4"
