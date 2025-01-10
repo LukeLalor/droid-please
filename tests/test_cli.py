@@ -11,6 +11,7 @@ from vcr import VCR
 
 load_dotenv()
 runner = CliRunner()
+os.environ.setdefault("ANTHROPIC_API_KEY", "test_key")
 
 
 @pytest.fixture(scope='module')
