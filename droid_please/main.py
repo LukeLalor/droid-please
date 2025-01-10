@@ -64,6 +64,13 @@ def init(loc: Annotated[Path, typer.Argument()] = Path.cwd()):
     with open(gitignore_path, "w") as f:
         f.write(".env\nconversations/\n")
 
+    # Copy README.md from package root to .droid directory
+    package_root = Path(__file__).parent.parent
+    source_readme = package_root.joinpath("README.md")
+    readme_path = droid_dir.joinpath("README.md")
+    with open(source_readme, "r") as src, open(readme_path, "w") as dst:
+        dst.write(src.read())
+
     if not os.getenv("ANTHROPIC_API_KEY"):
         # prompt for the api key. not required but recommended
         api_key = typer.prompt("Anthropic API key (optional)", default="", show_default=False)
@@ -226,7 +233,9 @@ def execute(agent: Agent, command: str, tool_override: List[callable] = None):
                     if chunk.is_error:
                         err_console.print(chunk.response)
                 elif isinstance(chunk, UsageSummary):
-                    dim_console.print(f"\ntokens: input {chunk.input:,} generated {chunk.generated:,}")
+                    dim_console.print(
+                        f"\ntokens: input {chunk.input:,} generated {chunk.generated:,}"
+                    )
                 last_chunk = chunk
         except AuthenticationError as e:
             status.stop()

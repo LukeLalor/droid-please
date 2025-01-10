@@ -14,11 +14,11 @@ runner = CliRunner()
 os.environ.setdefault("ANTHROPIC_API_KEY", "test_key")
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope="module")
 def vcr(vcr: VCR):
-    vcr.match_on = ['method', 'host', 'port', 'path', 'query', 'body']
-    vcr.filter_headers = ['x-api-key']
-    vcr.record_mode = 'once'
+    vcr.match_on = ["method", "host", "port", "path", "query", "body"]
+    vcr.filter_headers = ["x-api-key"]
+    vcr.record_mode = "once"
     return vcr
 
 
